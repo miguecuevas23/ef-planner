@@ -1,13 +1,12 @@
-import { useState, useMemo } from "react";
-import { mockActivities } from "../services/mockActivities";
+import { useState, useMemo, useEffect } from "react";
 import { Activity, PhysicalCapacity } from "../types/activity";
 import { CLASS_MOMENTS, PHYSICAL_CAPACITIES } from "../../../shared/constants/pedagogicalOptions";
+import { getAllActivities } from "../services/activityRepository";
+import { seedActivities } from "../services/seedActivities";
 import ActivityCard from "../components/ActivityCard";
 import ActivityDetailPage from "./ActivityDetailPage";
 import "./ActivitiesSearchPage.css";
 
-// selectedPhysicalCapacity usa el tipo exacto extraído de Activity ["physicalCapacity"].
-// Esto evita que strings sueltos rompan el filtro por diferencia de tipo.
 type PhysicalCapacityFilter = PhysicalCapacity | "";
 
 interface PageProps {
@@ -15,13 +14,41 @@ interface PageProps {
 }
 
 function ActivitiesSearchPage({ onBack }: PageProps) {
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
+
   const [searchText, setSearchText] = useState("");
   const [filterMoment, setFilterMoment] = useState("");
   const [selectedPhysicalCapacity, setSelectedPhysicalCapacity] = useState<PhysicalCapacityFilter>("");
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
 
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      setIsLoading(true);
+      setErrorMessage("");
+      try {
+        await seedActivities();
+        const data = await getAllActivities();
+        if (!cancelled) setActivities(data);
+      } catch (error) {
+        console.error(error);
+        if (!cancelled) {
+          setErrorMessage(
+            "No se pudieron cargar las actividades. Revisa la consola para más detalles."
+          );
+        }
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    }
+    load();
+    return () => { cancelled = true; };
+  }, []);
+
   const filteredActivities = useMemo(() => {
-    return mockActivities.filter((activity) => {
+    return activities.filter((activity) => {
       const matchesText =
         searchText === "" ||
         activity.name.toLowerCase().includes(searchText.toLowerCase()) ||
@@ -30,14 +57,13 @@ function ActivitiesSearchPage({ onBack }: PageProps) {
 
       const matchesMoment = filterMoment === "" || activity.classMoment === filterMoment;
 
-      // Comparación explícita: cadena vacía = sin filtro, sino compara contra el literal exacto.
       const matchesPhysicalCapacity =
         !selectedPhysicalCapacity ||
         activity.physicalCapacity === selectedPhysicalCapacity;
 
       return matchesText && matchesMoment && matchesPhysicalCapacity;
     });
-  }, [searchText, filterMoment, selectedPhysicalCapacity]);
+  }, [searchText, filterMoment, selectedPhysicalCapacity, activities]);
 
   if (selectedActivity) {
     return (
@@ -45,6 +71,33 @@ function ActivitiesSearchPage({ onBack }: PageProps) {
         activity={selectedActivity}
         onBack={() => setSelectedActivity(null)}
       />
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="search-page">
+        <div className="search-page-header">
+          <h1 className="search-page-title">Buscar actividades</h1>
+        </div>
+        <div className="search-empty">
+          <p>Cargando actividades...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (errorMessage) {
+    return (
+      <div className="search-page">
+        <div className="search-page-header">
+          <h1 className="search-page-title">Buscar actividades</h1>
+        </div>
+        <div className="search-empty">
+          <p>{errorMessage}</p>
+        </div>
+        <button className="back-btn" onClick={onBack}>← Volver</button>
+      </div>
     );
   }
 
@@ -76,7 +129,6 @@ function ActivitiesSearchPage({ onBack }: PageProps) {
             ))}
           </select>
 
-          {/* select de capacidad física: cada option.value == PhysicalCapacity literal */}
           <select
             className="search-filter"
             value={selectedPhysicalCapacity}
