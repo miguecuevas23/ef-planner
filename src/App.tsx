@@ -1,52 +1,36 @@
 import { useState } from "react";
-import "./styles.css";
+import DashboardPage from "./modules/dashboard/pages/DashboardPage";
+import ActivitiesSearchPage from "./modules/activities/pages/ActivitiesSearchPage";
+import ActivityFormPage from "./modules/activities/pages/ActivityFormPage";
+import FavoritesPage from "./modules/favorites/pages/FavoritesPage";
+import BackupPage from "./modules/backup/pages/BackupPage";
+import "./shared/components/Shared.css";
 
-interface CardProps {
-  title: string;
-  icon: string;
-  onClick: () => void;
-}
-
-function Card({ title, icon, onClick }: CardProps) {
-  return (
-    <button className="card" onClick={onClick}>
-      <span className="card-icon">{icon}</span>
-      <span className="card-title">{title}</span>
-    </button>
-  );
-}
+type Page = "dashboard" | "search" | "new" | "favorites" | "backups";
 
 function App() {
-  const [activeView, setActiveView] = useState<string | null>(null);
+  const [activePage, setActivePage] = useState<Page>("dashboard");
 
-  const handleCardClick = (view: string) => {
-    setActiveView(view);
+  const handleNavigate = (page: string) => {
+    setActivePage(page as Page);
   };
 
-  return (
-    <main className="container">
-      <header className="header">
-        <h1 className="title">EF Planner</h1>
-        <p className="subtitle">Biblioteca pedagógica para clases de Educación Física</p>
-      </header>
+  const handleBack = () => {
+    setActivePage("dashboard");
+  };
 
-      <section className="cards-grid">
-        <Card title="Buscar actividades" icon="🔍" onClick={() => handleCardClick("search")} />
-        <Card title="Nueva actividad" icon="➕" onClick={() => handleCardClick("new")} />
-        <Card title="Favoritas" icon="⭐" onClick={() => handleCardClick("favorites")} />
-        <Card title="Respaldos" icon="💾" onClick={() => handleCardClick("backups")} />
-      </section>
-
-      {activeView && (
-        <div className="placeholder-view">
-          <p>Vista: {activeView}</p>
-          <button className="back-btn" onClick={() => setActiveView(null)}>
-            ← Volver
-          </button>
-        </div>
-      )}
-    </main>
-  );
+  switch (activePage) {
+    case "search":
+      return <ActivitiesSearchPage onBack={handleBack} />;
+    case "new":
+      return <ActivityFormPage onBack={handleBack} />;
+    case "favorites":
+      return <FavoritesPage onBack={handleBack} />;
+    case "backups":
+      return <BackupPage onBack={handleBack} />;
+    default:
+      return <DashboardPage onNavigate={handleNavigate} />;
+  }
 }
 
 export default App;

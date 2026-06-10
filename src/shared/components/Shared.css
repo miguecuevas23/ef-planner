@@ -1,0 +1,26 @@
+.placeholder-view {
+  text-align: center;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: #ffffff;
+  width: 100%;
+}
+
+.back-btn {
+  padding: 0.5rem 1.5rem;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1a1a2e;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 1.5rem;
+}
+
+.back-btn:hover {
+  background: #ffffff;
+  transform: scale(1.05);
+}
