@@ -134,9 +134,8 @@ function ActivityFormPage({ onBack }: PageProps) {
       setTags("");
       setErrors({});
     } catch (error) {
-      console.error("Error al guardar actividad:", error);
-      const err: FieldErrors = { name: "Error al guardar. Revisa la consola." };
-      setErrors(err);
+      console.error("[Form] No se pudo guardar la actividad:", error);
+      alert("No se pudo guardar la actividad. Revisa la consola.");
     }
   }
 

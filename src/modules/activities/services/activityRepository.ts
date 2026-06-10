@@ -1,8 +1,6 @@
 import { Activity } from "../types/activity";
 import { getDb } from "../../../database/db";
 
-// Representación de una fila en SQLite.
-// Los campos de tipo arreglo se guardan como JSON string.
 interface ActivityRow {
   id: string;
   name: string;
@@ -36,7 +34,6 @@ function parseJsonField<T>(json: string): T {
   }
 }
 
-// Convierte una fila de SQLite a un objeto Activity del dominio.
 function fromActivityRow(row: ActivityRow): Activity {
   return {
     id: row.id,
@@ -64,7 +61,6 @@ function fromActivityRow(row: ActivityRow): Activity {
   };
 }
 
-// Convierte un Activity del dominio a un objeto plano para INSERT/UPDATE en SQLite.
 function toActivityRow(activity: Activity): Omit<ActivityRow, "id"> & { id: string } {
   return {
     id: activity.id,
@@ -92,68 +88,104 @@ function toActivityRow(activity: Activity): Omit<ActivityRow, "id"> & { id: stri
   };
 }
 
+export async function testDatabaseConnection(): Promise<boolean> {
+  try {
+    const database = await getDb();
+    await database.select<{ ok: number }[]>("SELECT 1 as ok");
+    console.log("[DB] Connection test: OK");
+    return true;
+  } catch (error) {
+    console.error("[DB] Connection test: FAILED", error);
+    return false;
+  }
+}
+
 export async function getAllActivities(): Promise<Activity[]> {
-  const database = await getDb();
-  const rows = await database.select<ActivityRow[]>("SELECT * FROM activities ORDER BY created_at DESC");
-  return rows.map(fromActivityRow);
+  try {
+    const database = await getDb();
+    const rows = await database.select<ActivityRow[]>("SELECT * FROM activities ORDER BY created_at DESC");
+    return rows.map(fromActivityRow);
+  } catch (error) {
+    console.error("[DB] Failed to load activities:", error);
+    throw error;
+  }
 }
 
 export async function createActivity(activity: Activity): Promise<void> {
-  const database = await getDb();
-  const row = toActivityRow(activity);
-  await database.execute(
-    `INSERT INTO activities (id, name, class_moment, primary_objective, secondary_objective,
-      physical_capacity, min_participants, max_participants, suggested_grades,
-      duration_minutes, intensity, space, equipment, description, organization,
-      variants, safety_notes, observation_criteria, tags, is_favorite, created_at, updated_at)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15,
-             $16, $17, $18, $19, $20, $21, $22)`,
-    [
-      row.id, row.name, row.class_moment, row.primary_objective, row.secondary_objective,
-      row.physical_capacity, row.min_participants, row.max_participants, row.suggested_grades,
-      row.duration_minutes, row.intensity, row.space, row.equipment, row.description,
-      row.organization, row.variants, row.safety_notes, row.observation_criteria,
-      row.tags, row.is_favorite, row.created_at, row.updated_at,
-    ]
-  );
+  try {
+    const database = await getDb();
+    const row = toActivityRow(activity);
+    await database.execute(
+      `INSERT INTO activities (id, name, class_moment, primary_objective, secondary_objective,
+        physical_capacity, min_participants, max_participants, suggested_grades,
+        duration_minutes, intensity, space, equipment, description, organization,
+        variants, safety_notes, observation_criteria, tags, is_favorite, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15,
+               $16, $17, $18, $19, $20, $21, $22)`,
+      [
+        row.id, row.name, row.class_moment, row.primary_objective, row.secondary_objective,
+        row.physical_capacity, row.min_participants, row.max_participants, row.suggested_grades,
+        row.duration_minutes, row.intensity, row.space, row.equipment, row.description,
+        row.organization, row.variants, row.safety_notes, row.observation_criteria,
+        row.tags, row.is_favorite, row.created_at, row.updated_at,
+      ]
+    );
+  } catch (error) {
+    console.error("[DB] Failed to create activity:", error);
+    throw error;
+  }
 }
 
 export async function updateActivity(activity: Activity): Promise<void> {
-  const database = await getDb();
-  const row = toActivityRow(activity);
-  await database.execute(
-    `UPDATE activities SET
-      name = $1, class_moment = $2, primary_objective = $3, secondary_objective = $4,
-      physical_capacity = $5, min_participants = $6, max_participants = $7,
-      suggested_grades = $8, duration_minutes = $9, intensity = $10, space = $11,
-      equipment = $12, description = $13, organization = $14, variants = $15,
-      safety_notes = $16, observation_criteria = $17, tags = $18, is_favorite = $19,
-      created_at = $20, updated_at = $21
-     WHERE id = $22`,
-    [
-      row.name, row.class_moment, row.primary_objective, row.secondary_objective,
-      row.physical_capacity, row.min_participants, row.max_participants,
-      row.suggested_grades, row.duration_minutes, row.intensity, row.space,
-      row.equipment, row.description, row.organization, row.variants,
-      row.safety_notes, row.observation_criteria, row.tags, row.is_favorite,
-      row.created_at, row.updated_at, row.id,
-    ]
-  );
+  try {
+    const database = await getDb();
+    const row = toActivityRow(activity);
+    await database.execute(
+      `UPDATE activities SET
+        name = $1, class_moment = $2, primary_objective = $3, secondary_objective = $4,
+        physical_capacity = $5, min_participants = $6, max_participants = $7,
+        suggested_grades = $8, duration_minutes = $9, intensity = $10, space = $11,
+        equipment = $12, description = $13, organization = $14, variants = $15,
+        safety_notes = $16, observation_criteria = $17, tags = $18, is_favorite = $19,
+        created_at = $20, updated_at = $21
+       WHERE id = $22`,
+      [
+        row.name, row.class_moment, row.primary_objective, row.secondary_objective,
+        row.physical_capacity, row.min_participants, row.max_participants,
+        row.suggested_grades, row.duration_minutes, row.intensity, row.space,
+        row.equipment, row.description, row.organization, row.variants,
+        row.safety_notes, row.observation_criteria, row.tags, row.is_favorite,
+        row.created_at, row.updated_at, row.id,
+      ]
+    );
+  } catch (error) {
+    console.error("[DB] Failed to update activity:", error);
+    throw error;
+  }
 }
 
 export async function deleteActivity(id: string): Promise<void> {
-  const database = await getDb();
-  await database.execute("DELETE FROM activities WHERE id = $1", [id]);
+  try {
+    const database = await getDb();
+    await database.execute("DELETE FROM activities WHERE id = $1", [id]);
+  } catch (error) {
+    console.error("[DB] Failed to delete activity:", error);
+    throw error;
+  }
 }
 
 export async function toggleFavorite(id: string, isFavorite: boolean): Promise<void> {
-  const database = await getDb();
-  const now = new Date().toISOString();
-  await database.execute(
-    "UPDATE activities SET is_favorite = $1, updated_at = $2 WHERE id = $3",
-    [isFavorite ? 1 : 0, now, id]
-  );
+  try {
+    const database = await getDb();
+    const now = new Date().toISOString();
+    await database.execute(
+      "UPDATE activities SET is_favorite = $1, updated_at = $2 WHERE id = $3",
+      [isFavorite ? 1 : 0, now, id]
+    );
+  } catch (error) {
+    console.error("[DB] Failed to toggle favorite:", error);
+    throw error;
+  }
 }
 
-// Exportadas para testing o uso futuro desde el formulario.
 export { fromActivityRow, toActivityRow };

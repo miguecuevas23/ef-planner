@@ -5,11 +5,11 @@ let db: Database | null = null;
 export async function getDb(): Promise<Database> {
   if (db) return db;
 
-  // Abre SQLite en el directorio de datos de la app.
-  // El archivo ef_planner.db se crea automáticamente si no existe.
+  console.log("[DB] Opening SQLite database...");
   db = await Database.load("sqlite:ef_planner.db");
+  console.log("[DB] SQLite database ready");
 
-  // Ejecuta migración inicial: crea la tabla si no existe.
+  console.log("[DB] Creating activities table...");
   await db.execute(`
     CREATE TABLE IF NOT EXISTS activities (
       id TEXT PRIMARY KEY,
@@ -36,6 +36,7 @@ export async function getDb(): Promise<Database> {
       updated_at TEXT NOT NULL
     );
   `);
+  console.log("[DB] Activities table ready");
 
   return db;
 }

@@ -1,8 +1,9 @@
 import { useState, useMemo, useEffect } from "react";
 import { Activity, PhysicalCapacity } from "../types/activity";
 import { CLASS_MOMENTS, PHYSICAL_CAPACITIES } from "../../../shared/constants/pedagogicalOptions";
-import { getAllActivities } from "../services/activityRepository";
+import { getAllActivities, testDatabaseConnection } from "../services/activityRepository";
 import { seedActivities } from "../services/seedActivities";
+import { mockActivities } from "../services/mockActivities";
 import ActivityCard from "../components/ActivityCard";
 import ActivityDetailPage from "./ActivityDetailPage";
 import "./ActivitiesSearchPage.css";
@@ -29,14 +30,22 @@ function ActivitiesSearchPage({ onBack }: PageProps) {
       setIsLoading(true);
       setErrorMessage("");
       try {
-        await seedActivities();
-        const data = await getAllActivities();
-        if (!cancelled) setActivities(data);
-      } catch (error) {
-        console.error(error);
-        if (!cancelled) {
+        const dbOk = await testDatabaseConnection();
+        if (!cancelled && dbOk) {
+          await seedActivities();
+          const data = await getAllActivities();
+          if (!cancelled) setActivities(data);
+        } else if (!cancelled) {
+          setActivities([...mockActivities]);
           setErrorMessage(
-            "No se pudieron cargar las actividades. Revisa la consola para más detalles."
+            "No se pudo conectar con SQLite. Mostrando actividades de ejemplo temporalmente."
+          );
+        }
+      } catch {
+        if (!cancelled) {
+          setActivities([...mockActivities]);
+          setErrorMessage(
+            "No se pudo conectar con SQLite. Mostrando actividades de ejemplo temporalmente."
           );
         }
       } finally {
@@ -87,26 +96,18 @@ function ActivitiesSearchPage({ onBack }: PageProps) {
     );
   }
 
-  if (errorMessage) {
-    return (
-      <div className="search-page">
-        <div className="search-page-header">
-          <h1 className="search-page-title">Buscar actividades</h1>
-        </div>
-        <div className="search-empty">
-          <p>{errorMessage}</p>
-        </div>
-        <button className="back-btn" onClick={onBack}>← Volver</button>
-      </div>
-    );
-  }
-
   return (
     <div className="search-page">
       <div className="search-page-header">
         <h1 className="search-page-title">Buscar actividades</h1>
         <p className="search-page-subtitle">Encuentra actividades pedagógicas para tu clase</p>
       </div>
+
+      {errorMessage && (
+        <div className="search-empty" style={{ marginBottom: "1rem" }}>
+          <p>{errorMessage}</p>
+        </div>
+      )}
 
       <div className="search-controls">
         <input
