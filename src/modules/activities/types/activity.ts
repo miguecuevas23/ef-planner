@@ -1,16 +1,24 @@
+// Tipos centralizados para capacidades físicas.
+// Usar siempre PhysicalCapacity en lugar de strings sueltos.
+export type PhysicalCapacity = "resistencia" | "fuerza" | "velocidad" | "flexibilidad" | "coordinacion" | "equilibrio" | "agilidad" | "reaccion";
+
+export type ClassMoment = "calentamiento" | "desarrollo" | "cierre";
+export type IntensityLevel = "baja" | "media" | "alta";
+export type Space = "sala" | "patio_pequeno" | "multicancha" | "gimnasio" | "cancha_grande";
+
 export interface Activity {
   id: string;
   name: string;
-  classMoment: "calentamiento" | "desarrollo" | "cierre";
+  classMoment: ClassMoment;
   primaryObjective: string;
   secondaryObjective?: string;
-  physicalCapacity: "resistencia" | "fuerza" | "velocidad" | "flexibilidad" | "coordinacion" | "equilibrio" | "agilidad" | "reaccion";
+  physicalCapacity: PhysicalCapacity;
   minParticipants: number;
   maxParticipants: number;
   suggestedGrades: string[];
   durationMinutes: number;
-  intensity: "baja" | "media" | "alta";
-  space: "sala" | "patio_pequeno" | "multicancha" | "gimnasio" | "cancha_grande";
+  intensity: IntensityLevel;
+  space: Space;
   equipment: string[];
   description: string;
   organization: string;

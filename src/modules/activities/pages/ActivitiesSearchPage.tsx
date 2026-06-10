@@ -1,10 +1,14 @@
 import { useState, useMemo } from "react";
 import { mockActivities } from "../services/mockActivities";
-import { Activity } from "../types/activity";
+import { Activity, PhysicalCapacity } from "../types/activity";
 import { CLASS_MOMENTS, PHYSICAL_CAPACITIES } from "../../../shared/constants/pedagogicalOptions";
 import ActivityCard from "../components/ActivityCard";
 import ActivityDetailPage from "./ActivityDetailPage";
 import "./ActivitiesSearchPage.css";
+
+// selectedPhysicalCapacity usa el tipo exacto extraído de Activity ["physicalCapacity"].
+// Esto evita que strings sueltos rompan el filtro por diferencia de tipo.
+type PhysicalCapacityFilter = PhysicalCapacity | "";
 
 interface PageProps {
   onBack: () => void;
@@ -13,7 +17,7 @@ interface PageProps {
 function ActivitiesSearchPage({ onBack }: PageProps) {
   const [searchText, setSearchText] = useState("");
   const [filterMoment, setFilterMoment] = useState("");
-  const [filterCapacity, setFilterCapacity] = useState("");
+  const [selectedPhysicalCapacity, setSelectedPhysicalCapacity] = useState<PhysicalCapacityFilter>("");
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
 
   const filteredActivities = useMemo(() => {
@@ -25,11 +29,15 @@ function ActivitiesSearchPage({ onBack }: PageProps) {
         activity.tags.some((tag) => tag.toLowerCase().includes(searchText.toLowerCase()));
 
       const matchesMoment = filterMoment === "" || activity.classMoment === filterMoment;
-      const matchesCapacity = filterCapacity === "" || activity.physicalCapacity === filterCapacity;
 
-      return matchesText && matchesMoment && matchesCapacity;
+      // Comparación explícita: cadena vacía = sin filtro, sino compara contra el literal exacto.
+      const matchesPhysicalCapacity =
+        !selectedPhysicalCapacity ||
+        activity.physicalCapacity === selectedPhysicalCapacity;
+
+      return matchesText && matchesMoment && matchesPhysicalCapacity;
     });
-  }, [searchText, filterMoment, filterCapacity]);
+  }, [searchText, filterMoment, selectedPhysicalCapacity]);
 
   if (selectedActivity) {
     return (
@@ -68,10 +76,11 @@ function ActivitiesSearchPage({ onBack }: PageProps) {
             ))}
           </select>
 
+          {/* select de capacidad física: cada option.value == PhysicalCapacity literal */}
           <select
             className="search-filter"
-            value={filterCapacity}
-            onChange={(e) => setFilterCapacity(e.target.value)}
+            value={selectedPhysicalCapacity}
+            onChange={(e) => setSelectedPhysicalCapacity(e.target.value as PhysicalCapacityFilter)}
           >
             <option value="">Todas las capacidades</option>
             {PHYSICAL_CAPACITIES.map((c) => (
@@ -82,12 +91,12 @@ function ActivitiesSearchPage({ onBack }: PageProps) {
       </div>
 
       <p className="search-results-count">
-        {filteredActivities.length} actividad{filteredActivities.length !== 1 ? "es" : ""} encontrada{filteredActivities.length !== 1 ? "s" : ""}
+        Mostrando {filteredActivities.length} actividad{filteredActivities.length !== 1 ? "es" : ""}
       </p>
 
       {filteredActivities.length === 0 ? (
         <div className="search-empty">
-          <p>No se encontraron actividades con esos filtros.</p>
+          <p>No se encontraron actividades con los filtros seleccionados.</p>
         </div>
       ) : (
         <div className="activities-list">
