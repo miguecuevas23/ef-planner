@@ -4,13 +4,14 @@ import "./ActivityCard.css";
 
 interface ActivityCardProps {
   activity: Activity;
+  onViewDetail: (activity: Activity) => void;
 }
 
 function getLabel(options: { value: string; label: string }[], value: string): string {
   return options.find((o) => o.value === value)?.label ?? value;
 }
 
-function ActivityCard({ activity }: ActivityCardProps) {
+function ActivityCard({ activity, onViewDetail }: ActivityCardProps) {
   return (
     <article className="activity-card">
       <div className="activity-card-header">
@@ -45,7 +46,7 @@ function ActivityCard({ activity }: ActivityCardProps) {
 
       <p className="activity-card-description">{activity.description}</p>
 
-      <button className="activity-card-button" onClick={() => {}}>
+      <button className="activity-card-button" onClick={() => onViewDetail(activity)}>
         Ver detalle
       </button>
     </article>

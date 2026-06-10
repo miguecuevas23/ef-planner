@@ -1,7 +1,9 @@
 import { useState, useMemo } from "react";
 import { mockActivities } from "../services/mockActivities";
+import { Activity } from "../types/activity";
 import { CLASS_MOMENTS, PHYSICAL_CAPACITIES } from "../../../shared/constants/pedagogicalOptions";
 import ActivityCard from "../components/ActivityCard";
+import ActivityDetailPage from "./ActivityDetailPage";
 import "./ActivitiesSearchPage.css";
 
 interface PageProps {
@@ -12,6 +14,7 @@ function ActivitiesSearchPage({ onBack }: PageProps) {
   const [searchText, setSearchText] = useState("");
   const [filterMoment, setFilterMoment] = useState("");
   const [filterCapacity, setFilterCapacity] = useState("");
+  const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
 
   const filteredActivities = useMemo(() => {
     return mockActivities.filter((activity) => {
@@ -27,6 +30,15 @@ function ActivitiesSearchPage({ onBack }: PageProps) {
       return matchesText && matchesMoment && matchesCapacity;
     });
   }, [searchText, filterMoment, filterCapacity]);
+
+  if (selectedActivity) {
+    return (
+      <ActivityDetailPage
+        activity={selectedActivity}
+        onBack={() => setSelectedActivity(null)}
+      />
+    );
+  }
 
   return (
     <div className="search-page">
@@ -80,7 +92,11 @@ function ActivitiesSearchPage({ onBack }: PageProps) {
       ) : (
         <div className="activities-list">
           {filteredActivities.map((activity) => (
-            <ActivityCard key={activity.id} activity={activity} />
+            <ActivityCard
+              key={activity.id}
+              activity={activity}
+              onViewDetail={setSelectedActivity}
+            />
           ))}
         </div>
       )}
