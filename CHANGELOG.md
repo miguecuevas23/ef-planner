@@ -3,8 +3,9 @@
 ## 1.2.1-beta
 
 - Agregado botón Inicio/Home en las páginas internas para volver rápidamente al menú principal.
-- Preparada versión beta 1.2.1 para prueba de actualización desde 1.2.0-beta.
-- Ajustado endpoint beta del updater hacia v1.2.1-beta.
+- Configurado canal permanente beta del updater mediante release updater-beta.
+- Evitado uso de endpoints fijos por versión para futuras actualizaciones.
+- Preparada app 1.2.1-beta para detectar futuras versiones beta como 1.2.2-beta.
 
 ## 1.2.0-beta
 
