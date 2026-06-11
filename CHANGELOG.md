@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.4-beta
+
+- Establecido valor por defecto de 2 estudiantes mínimos al crear una nueva actividad.
+
 ## 1.2.3-beta
 
 - Agregado botón "Actualizar ahora" cuando existe una nueva versión disponible.

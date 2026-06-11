@@ -39,7 +39,7 @@ function ActivityFormPage({ onBack, activityToEdit, onSaved }: PageProps) {
   const [primaryObjective, setPrimaryObjective] = useState("");
   const [secondaryObjective, setSecondaryObjective] = useState("");
   const [physicalCapacity, setPhysicalCapacity] = useState<PhysicalCapacity | "">("");
-  const [minParticipants, setMinParticipants] = useState<string>("");
+  const [minParticipants, setMinParticipants] = useState<string>("2");
   const [maxParticipants, setMaxParticipants] = useState<string>("");
   const [suggestedGrades, setSuggestedGrades] = useState<string[]>([]);
   const [durationMinutes, setDurationMinutes] = useState<string>("");
