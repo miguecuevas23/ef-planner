@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.3-beta
+
+- Agregado botón "Actualizar ahora" cuando existe una nueva versión disponible.
+- Agregado flujo de descarga, instalación y reinicio de la app.
+- Agregado estado visual de progreso durante la actualización.
+- Mantenido endpoint permanente updater-beta.
+
 ## 1.2.2-beta
 
 - Agregado aviso inicial de ubicación de datos y respaldos.

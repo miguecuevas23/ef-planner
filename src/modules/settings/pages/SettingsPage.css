@@ -154,3 +154,72 @@
   background: rgba(255, 107, 107, 0.15);
   color: #ff6b6b;
 }
+
+.settings-update-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 10px;
+  padding: 1rem;
+  margin: 0.5rem 0;
+}
+
+.update-card-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.3rem 0;
+  font-size: 0.85rem;
+  color: #1a1a2e;
+}
+
+.update-card-new {
+  font-weight: 700;
+  color: #764ba2;
+}
+
+.update-card-notes {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  font-size: 0.8rem;
+  color: #666;
+  line-height: 1.4;
+}
+
+.update-card-notes p {
+  margin: 0.2rem 0;
+}
+
+.update-card-warning {
+  font-size: 0.8rem;
+  color: #888;
+  margin: 0.5rem 0;
+  font-style: italic;
+}
+
+.settings-update-install-btn {
+  width: 100%;
+  padding: 0.6rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #ffffff;
+  background: linear-gradient(135deg, #48c78e 0%, #38b278 100%);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.settings-update-install-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(72, 199, 142, 0.3);
+}
+
+.update-card-progress {
+  text-align: center;
+  padding: 0.6rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: rgba(102, 126, 234, 0.15);
+  color: #667eea;
+}

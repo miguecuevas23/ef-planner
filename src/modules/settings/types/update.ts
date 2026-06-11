@@ -12,4 +12,5 @@ export interface UpdateCheckResult {
   currentVersion: string;
   latestVersion?: string;
   message: string;
+  notes?: string;
 }

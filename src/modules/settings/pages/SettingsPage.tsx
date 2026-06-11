@@ -8,7 +8,7 @@ import {
   getUpdateChannel,
   setUpdateChannel,
 } from "../services/updatePreferencesService";
-import { checkForUpdates } from "../services/updateService";
+import { checkForUpdates, downloadAndInstallUpdate } from "../services/updateService";
 import { UpdateStatus } from "../types/update";
 import { open } from "@tauri-apps/plugin-dialog";
 import HomeButton from "../../../shared/components/HomeButton";
@@ -25,6 +25,10 @@ function SettingsPage({ onBack }: PageProps) {
   const [channel, setChannel] = useState<"beta" | "stable">("beta");
   const [updateStatus, setUpdateStatus] = useState<UpdateStatus>("idle");
   const [updateMessage, setUpdateMessage] = useState("");
+  const [latestVersion, setLatestVersion] = useState("");
+  const [updateNotes, setUpdateNotes] = useState("");
+  const [installProgress, setInstallProgress] = useState("");
+  const [isInstalling, setIsInstalling] = useState(false);
   const [backupDir, setBackupDir] = useState<string | null>(null);
 
   useEffect(() => {
@@ -55,9 +59,30 @@ function SettingsPage({ onBack }: PageProps) {
   async function handleCheckUpdates() {
     setUpdateStatus("checking");
     setUpdateMessage("Buscando actualizaciones...");
+    setLatestVersion("");
+    setUpdateNotes("");
     const result = await checkForUpdates();
     setUpdateStatus(result.status);
     setUpdateMessage(result.message);
+    if (result.latestVersion) setLatestVersion(result.latestVersion);
+    if (result.notes) setUpdateNotes(result.notes);
+  }
+
+  async function handleInstallUpdate() {
+    setIsInstalling(true);
+    setInstallProgress("Descargando actualización...");
+    try {
+      await downloadAndInstallUpdate(() => {
+        setInstallProgress("Descargando actualización...");
+      });
+      setInstallProgress("Instalando actualización...");
+    } catch (error) {
+      console.error("[Settings] Install failed:", error);
+      setInstallProgress("");
+      setIsInstalling(false);
+      setUpdateMessage("No se pudo instalar la actualización. Revisa tu conexión o intenta nuevamente.");
+      setUpdateStatus("error");
+    }
   }
 
   async function handleChangeBackupDir() {
@@ -121,6 +146,35 @@ function SettingsPage({ onBack }: PageProps) {
         {updateMessage && (
           <div className={`settings-update-msg settings-update-${updateStatus}`}>
             {updateMessage}
+          </div>
+        )}
+
+        {updateStatus === "available" && latestVersion && (
+          <div className="settings-update-card">
+            <div className="update-card-row">
+              <span>Versión actual</span>
+              <span>{APP_VERSION}</span>
+            </div>
+            <div className="update-card-row">
+              <span>Nueva versión</span>
+              <span className="update-card-new">{latestVersion}</span>
+            </div>
+            {updateNotes && (
+              <div className="update-card-notes">
+                <p>Notas de la actualización:</p>
+                <p>{updateNotes}</p>
+              </div>
+            )}
+            <p className="update-card-warning">
+              La app descargará la actualización y se reiniciará para completar la instalación.
+            </p>
+            {isInstalling ? (
+              <div className="update-card-progress">{installProgress}</div>
+            ) : (
+              <button type="button" className="settings-update-install-btn" onClick={handleInstallUpdate}>
+                Actualizar ahora
+              </button>
+            )}
           </div>
         )}
 
