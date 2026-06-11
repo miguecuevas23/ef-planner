@@ -1,6 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { exportActivitiesBackup, importActivitiesBackup } from "../services/backupService";
 import { ImportResult } from "../types/backup";
+import { getSetting } from "../../../database/metadataRepository";
+import { writeTextFile } from "@tauri-apps/plugin-fs";
+import { getAllActivities } from "../../activities/services/activityRepository";
 import HomeButton from "../../../shared/components/HomeButton";
 import "../../activities/pages/ActivitiesSearchPage.css";
 import "./BackupPage.css";
@@ -13,6 +16,15 @@ function BackupPage({ onBack }: PageProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState<"success" | "error" | "info">("info");
+  const [backupDir, setBackupDir] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function load() {
+      const dir = await getSetting("backup_directory");
+      setBackupDir(dir);
+    }
+    load();
+  }, []);
 
   function showSuccess(text: string) {
     setMessage(text);
@@ -38,6 +50,32 @@ function BackupPage({ onBack }: PageProps) {
     } catch (error) {
       console.error("[Backup] Export error:", error);
       showError("No se pudo exportar el respaldo. Revisa la consola.");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function handleQuickExport() {
+    if (!backupDir) return;
+    setIsLoading(true);
+    setMessage("");
+    try {
+      const activities = await getAllActivities();
+      const backup = {
+        app: "EF Planner",
+        version: "1.0",
+        exportedAt: new Date().toISOString(),
+        totalActivities: activities.length,
+        activities,
+      };
+      const json = JSON.stringify(backup, null, 2);
+      const today = new Date().toISOString().slice(0, 10);
+      const fileName = `ef-planner-backup-${today}.json`;
+      await writeTextFile(`${backupDir}/${fileName}`, json);
+      showSuccess(`Respaldo guardado en ${backupDir}/${fileName}`);
+    } catch (error) {
+      console.error("[Backup] Quick export error:", error);
+      showError("No se pudo guardar el respaldo rápido. Revisa la consola.");
     } finally {
       setIsLoading(false);
     }
@@ -72,6 +110,16 @@ function BackupPage({ onBack }: PageProps) {
         <p className="search-page-subtitle">Exporta o importa tus actividades pedagógicas</p>
       </div>
 
+      {backupDir ? (
+        <div className="backup-dir-info">
+          Carpeta configurada: {backupDir}
+        </div>
+      ) : (
+        <div className="backup-dir-info backup-dir-warning">
+          Aún no has configurado una carpeta de respaldos. Puedes hacerlo en Configuración.
+        </div>
+      )}
+
       {isLoading && (
         <div className="search-empty">
           <p>Procesando...</p>
@@ -85,11 +133,29 @@ function BackupPage({ onBack }: PageProps) {
       )}
 
       <div className="cards-grid">
+        {backupDir && (
+          <div className="backup-card">
+            <span className="backup-card-icon">⚡</span>
+            <h3 className="backup-card-title">Respaldo rápido</h3>
+            <p className="backup-card-desc">
+              Guarda el respaldo directamente en tu carpeta configurada sin preguntar ubicación.
+            </p>
+            <button
+              type="button"
+              className="backup-btn"
+              onClick={handleQuickExport}
+              disabled={isLoading}
+            >
+              Guardar en carpeta configurada
+            </button>
+          </div>
+        )}
+
         <div className="backup-card">
           <span className="backup-card-icon">📤</span>
           <h3 className="backup-card-title">Exportar respaldo</h3>
           <p className="backup-card-desc">
-            Guarda todas tus actividades en un archivo JSON para respaldo o copia de seguridad.
+            Guarda todas tus actividades en un archivo JSON. Elige dónde guardarlo.
           </p>
           <button
             type="button"

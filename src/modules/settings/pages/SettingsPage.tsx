@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { APP_VERSION, APP_CHANNEL } from "../../../shared/constants/appVersion";
 import { getSchemaVersion } from "../../../database/metadataRepository";
+import { getSetting, setSetting } from "../../../database/metadataRepository";
 import {
   getCheckUpdatesOnStartup,
   setCheckUpdatesOnStartup,
@@ -9,6 +10,7 @@ import {
 } from "../services/updatePreferencesService";
 import { checkForUpdates } from "../services/updateService";
 import { UpdateStatus } from "../types/update";
+import { open } from "@tauri-apps/plugin-dialog";
 import HomeButton from "../../../shared/components/HomeButton";
 import "../../activities/pages/ActivitiesSearchPage.css";
 import "./SettingsPage.css";
@@ -23,6 +25,7 @@ function SettingsPage({ onBack }: PageProps) {
   const [channel, setChannel] = useState<"beta" | "stable">("beta");
   const [updateStatus, setUpdateStatus] = useState<UpdateStatus>("idle");
   const [updateMessage, setUpdateMessage] = useState("");
+  const [backupDir, setBackupDir] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -32,6 +35,8 @@ function SettingsPage({ onBack }: PageProps) {
       setCheckUpdates(cu);
       const ch = await getUpdateChannel();
       setChannel(ch);
+      const dir = await getSetting("backup_directory");
+      setBackupDir(dir);
     }
     load();
   }, []);
@@ -53,6 +58,23 @@ function SettingsPage({ onBack }: PageProps) {
     const result = await checkForUpdates();
     setUpdateStatus(result.status);
     setUpdateMessage(result.message);
+  }
+
+  async function handleChangeBackupDir() {
+    const selected = await open({
+      directory: true,
+      multiple: false,
+      title: "Elegir carpeta de respaldos",
+    });
+    if (selected) {
+      await setSetting("backup_directory", selected as string);
+      setBackupDir(selected as string);
+    }
+  }
+
+  async function handleResetSetup() {
+    await setSetting("storage_setup_completed", "false");
+    window.location.reload();
   }
 
   return (
@@ -131,6 +153,36 @@ function SettingsPage({ onBack }: PageProps) {
               Estable
             </button>
           </div>
+        </div>
+      </div>
+
+      <div className="settings-section">
+        <h2 className="settings-section-title">Datos y respaldos</h2>
+
+        <div className="settings-field">
+          <span className="settings-label">Almacenamiento local</span>
+          <span className="settings-value">SQLite interno</span>
+        </div>
+
+        <div className="settings-field">
+          <span className="settings-label">Carpeta de respaldos</span>
+          <span className="settings-value" style={backupDir ? {} : { color: "#aaa" }}>
+            {backupDir || "No configurada"}
+          </span>
+        </div>
+
+        <div className="settings-field">
+          <span className="settings-label">Gestionar carpeta</span>
+          <button type="button" className="settings-update-btn" onClick={handleChangeBackupDir}>
+            Cambiar carpeta de respaldos
+          </button>
+        </div>
+
+        <div className="settings-field">
+          <span className="settings-label">Aviso inicial</span>
+          <button type="button" className="settings-toggle" onClick={handleResetSetup}>
+            Mostrar nuevamente
+          </button>
         </div>
       </div>
 

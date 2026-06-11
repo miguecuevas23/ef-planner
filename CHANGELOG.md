@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.2-beta
+
+- Agregado aviso inicial de ubicación de datos y respaldos.
+- Agregada selección de carpeta predeterminada para respaldos JSON.
+- Agregada sección "Datos y respaldos" en Configuración.
+- Agregado respaldo rápido a carpeta configurada.
+- Mantenido endpoint permanente updater-beta para actualizaciones futuras.
+
 ## 1.2.1-beta
 
 - Agregado botón Inicio/Home en las páginas internas para volver rápidamente al menú principal.
