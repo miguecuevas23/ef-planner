@@ -4,9 +4,10 @@ import ActivitiesSearchPage from "./modules/activities/pages/ActivitiesSearchPag
 import ActivityFormPage from "./modules/activities/pages/ActivityFormPage";
 import FavoritesPage from "./modules/favorites/pages/FavoritesPage";
 import BackupPage from "./modules/backup/pages/BackupPage";
+import SettingsPage from "./modules/settings/pages/SettingsPage";
 import "./shared/components/Shared.css";
 
-type Page = "dashboard" | "search" | "new" | "favorites" | "backups";
+type Page = "dashboard" | "search" | "new" | "favorites" | "backups" | "settings";
 
 function App() {
   const [activePage, setActivePage] = useState<Page>("dashboard");
@@ -28,6 +29,8 @@ function App() {
       return <FavoritesPage onBack={handleBack} />;
     case "backups":
       return <BackupPage onBack={handleBack} />;
+    case "settings":
+      return <SettingsPage onBack={handleBack} />;
     default:
       return <DashboardPage onNavigate={handleNavigate} />;
   }

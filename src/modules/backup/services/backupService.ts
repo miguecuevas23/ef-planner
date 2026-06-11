@@ -8,6 +8,7 @@ const APP_NAME = "EF Planner";
 const APP_VERSION = "1.0";
 
 export async function exportActivitiesBackup(): Promise<void> {
+  console.log("[Backup] Starting export");
   const activities = await getAllActivities();
 
   const backup: ActivitiesBackup = {
@@ -29,7 +30,10 @@ export async function exportActivitiesBackup(): Promise<void> {
 
   if (!filePath) return;
 
+  console.log("[Backup] Save path selected:", filePath);
+  console.log("[Backup] Writing backup file");
   await writeTextFile(filePath, json);
+  console.log("[Backup] Export completed");
 }
 
 function isValidActivity(obj: any): obj is Activity {
@@ -45,6 +49,8 @@ function isValidActivity(obj: any): obj is Activity {
 }
 
 export async function importActivitiesBackup(): Promise<ImportResult | null> {
+  console.log("[Backup] Starting import");
+
   const filePath = await open({
     filters: [{ name: "JSON", extensions: ["json"] }],
     multiple: false,
@@ -52,9 +58,12 @@ export async function importActivitiesBackup(): Promise<ImportResult | null> {
 
   if (!filePath) return null;
 
-  const raw = await readTextFile(filePath as string);
-  let data: unknown;
+  console.log("[Backup] Open path selected:", filePath);
 
+  const raw = await readTextFile(filePath as string);
+  console.log("[Backup] Reading backup file");
+
+  let data: unknown;
   try {
     data = JSON.parse(raw);
   } catch {
@@ -88,5 +97,6 @@ export async function importActivitiesBackup(): Promise<ImportResult | null> {
     imported++;
   }
 
+  console.log("[Backup] Import completed");
   return { imported, skipped };
 }

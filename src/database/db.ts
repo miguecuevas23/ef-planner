@@ -1,39 +1,26 @@
 import Database from "@tauri-apps/plugin-sql";
+import { runDatabaseMigrations } from "./migrations";
 
 let db: Database | null = null;
+let migrationsApplied = false;
 
 export async function getDb(): Promise<Database> {
   if (db) return db;
 
-  console.log("[DB] Opening SQLite database...");
-  db = await Database.load("sqlite:ef_planner.db");
+  try {
+    console.log("[DB] Opening sqlite:ef_planner.db");
+    db = await Database.load("sqlite:ef_planner.db");
+    console.log("[DB] Database instance created");
 
-  await db.execute(`
-    CREATE TABLE IF NOT EXISTS activities (
-      id TEXT PRIMARY KEY,
-      name TEXT NOT NULL,
-      class_moment TEXT NOT NULL,
-      primary_objective TEXT NOT NULL,
-      secondary_objective TEXT,
-      physical_capacity TEXT NOT NULL,
-      min_participants INTEGER NOT NULL,
-      max_participants INTEGER NOT NULL,
-      suggested_grades TEXT NOT NULL,
-      duration_minutes INTEGER NOT NULL,
-      intensity TEXT NOT NULL,
-      space TEXT NOT NULL,
-      equipment TEXT NOT NULL,
-      description TEXT NOT NULL,
-      organization TEXT NOT NULL,
-      variants TEXT NOT NULL,
-      safety_notes TEXT NOT NULL,
-      observation_criteria TEXT NOT NULL,
-      tags TEXT NOT NULL,
-      is_favorite INTEGER NOT NULL DEFAULT 0,
-      created_at TEXT NOT NULL,
-      updated_at TEXT NOT NULL
-    );
-  `);
+    if (!migrationsApplied) {
+      await runDatabaseMigrations(db);
+      migrationsApplied = true;
+    }
 
-  return db;
+    return db;
+  } catch (error) {
+    console.error("[DB] Failed to open database", error);
+    db = null;
+    throw error;
+  }
 }

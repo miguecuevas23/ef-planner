@@ -18,6 +18,7 @@ function DashboardPage({ onNavigate }: DashboardPageProps) {
         <DashboardCard title="Nueva actividad" icon="➕" onClick={() => onNavigate("new")} />
         <DashboardCard title="Favoritas" icon="⭐" onClick={() => onNavigate("favorites")} />
         <DashboardCard title="Respaldos" icon="💾" onClick={() => onNavigate("backups")} />
+        <DashboardCard title="Configuración" icon="⚙️" onClick={() => onNavigate("settings")} />
       </section>
     </main>
   );

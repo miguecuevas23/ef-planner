@@ -29,18 +29,24 @@ pnpm tauri dev
 pnpm tauri build
 ```
 
-## Funcionalidades (v0.1.0)
+## Funcionalidades (v1.1)
 
-- Dashboard inicial
+- Dashboard con navegación a todos los módulos
 - Biblioteca de actividades con CRUD completo
 - Búsqueda por texto, filtro por momento de clase y capacidad física
-- Vista de detalle con toda la información pedagógica
+- Vista de detalle con información pedagógica completa
 - Marcar/desmarcar actividades como favoritas
 - Sección de favoritas
 - Persistencia local en SQLite
 - Exportar respaldo a archivo JSON
-- Importar respaldo desde archivo JSON
+- Importar respaldo desde archivo JSON sin duplicar
 - App completamente offline
+- Configuración de actualizaciones y canal (beta/stable)
+- Sistema de migraciones incrementales (protege datos del usuario)
+
+## Estrategia de actualizaciones seguras
+
+EF Planner es **local-first**. Los datos residen en SQLite local y nunca se borran durante actualizaciones. Las migraciones de BD son incrementales (`CREATE TABLE IF NOT EXISTS`, `ALTER TABLE`) — nunca `DROP TABLE`. Ver [`docs/UPDATE_STRATEGY.md`](docs/UPDATE_STRATEGY.md) para más detalles.
 
 ## Funcionalidades futuras
 
@@ -48,3 +54,5 @@ pnpm tauri build
 - Unidades didácticas
 - Evaluaciones
 - Exportación a PDF
+- Actualizaciones automáticas con Tauri Updater
+- Sincronización opcional entre dispositivos
