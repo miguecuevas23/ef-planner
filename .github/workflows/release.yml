@@ -35,11 +35,17 @@ jobs:
         with:
           targets: aarch64-apple-darwin
 
+      - name: Restore Tauri updater private key
+        run: |
+          mkdir -p "$HOME/.tauri"
+          echo "${{ secrets.TAURI_SIGNING_PRIVATE_KEY_B64 }}" | base64 --decode > "$HOME/.tauri/ef-planner-updater.key"
+          chmod 600 "$HOME/.tauri/ef-planner-updater.key"
+
       - name: Build and release Tauri app
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PATH: $HOME/.tauri/ef-planner-updater.key
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           tagName: ${{ github.ref_name }}
