@@ -45,10 +45,8 @@ function FavoritesPage({ onBack }: PageProps) {
         }}
         onEdit={() => {}}
         onDeleted={async () => {
-          console.log("[UI] Reloading favorites after delete");
           setSelectedActivity(null);
           await load();
-          console.log("[UI] Favorites reloaded after delete");
         }}
       />
     );

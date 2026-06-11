@@ -7,9 +7,7 @@ export async function getDb(): Promise<Database> {
 
   console.log("[DB] Opening SQLite database...");
   db = await Database.load("sqlite:ef_planner.db");
-  console.log("[DB] SQLite database ready");
 
-  console.log("[DB] Creating activities table...");
   await db.execute(`
     CREATE TABLE IF NOT EXISTS activities (
       id TEXT PRIMARY KEY,
@@ -36,7 +34,6 @@ export async function getDb(): Promise<Database> {
       updated_at TEXT NOT NULL
     );
   `);
-  console.log("[DB] Activities table ready");
 
   return db;
 }

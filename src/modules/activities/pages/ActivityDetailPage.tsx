@@ -76,7 +76,6 @@ function ActivityDetailPage({ activity, onBack, onEdit, onDeleted }: ActivityDet
   }
 
   const handleDeleteClick = () => {
-    console.log("[UI] Delete button clicked", activity.id);
     setDeleteError("");
     setShowDeleteConfirm(true);
   };
@@ -84,14 +83,7 @@ function ActivityDetailPage({ activity, onBack, onEdit, onDeleted }: ActivityDet
   const handleConfirmDelete = async () => {
     try {
       setIsDeleting(true);
-
-      console.log("[UI] Confirmed delete", activity.id);
-      console.log("[UI] Calling deleteActivity", activity.id);
-
       await deleteActivity(activity.id);
-
-      console.log("[UI] Delete completed", activity.id);
-
       setShowDeleteConfirm(false);
       onDeleted();
     } catch (error) {

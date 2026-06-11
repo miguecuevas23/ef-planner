@@ -92,7 +92,6 @@ export async function testDatabaseConnection(): Promise<boolean> {
   try {
     const database = await getDb();
     await database.select<{ ok: number }[]>("SELECT 1 as ok");
-    console.log("[DB] Connection test: OK");
     return true;
   } catch (error) {
     console.error("[DB] Connection test: FAILED", error);
@@ -170,16 +169,12 @@ export async function deleteActivity(id: string): Promise<void> {
   }
 
   try {
-    console.log("[Activities] Deleting activity with id:", id);
     const database = await getDb();
 
-    const result = await database.execute(
+    await database.execute(
       "DELETE FROM activities WHERE id = $1",
       [id]
     );
-
-    console.log("[Activities] Delete result:", result);
-    console.log("[Activities] Activity deleted:", id);
   } catch (error) {
     console.error("[Activities] Failed to delete activity:", error);
     throw error;

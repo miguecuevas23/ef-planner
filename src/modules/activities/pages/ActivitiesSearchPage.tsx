@@ -84,10 +84,8 @@ function ActivitiesSearchPage({ onBack }: PageProps) {
   }
 
   async function handleDeleted() {
-    console.log("[UI] Reloading activities after delete");
     setSelectedActivity(null);
     await loadActivities();
-    console.log("[UI] Activities reloaded after delete");
   }
 
   if (editingActivity) {
