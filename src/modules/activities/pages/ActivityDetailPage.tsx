@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Activity } from "../types/activity";
 import {
   CLASS_MOMENTS,
@@ -7,11 +8,14 @@ import {
   COMMON_EQUIPMENT,
   SUGGESTED_GRADES,
 } from "../../../shared/constants/pedagogicalOptions";
+import { toggleFavorite, deleteActivity } from "../services/activityRepository";
 import "./ActivityDetailPage.css";
 
 interface ActivityDetailPageProps {
   activity: Activity;
   onBack: () => void;
+  onEdit: (activity: Activity) => void;
+  onDeleted: () => void;
 }
 
 function getLabel(options: { value: string; label: string }[], value: string): string {
@@ -55,7 +59,49 @@ function Field({ label, value }: { label: string; value: string }) {
   );
 }
 
-function ActivityDetailPage({ activity, onBack }: ActivityDetailPageProps) {
+function ActivityDetailPage({ activity, onBack, onEdit, onDeleted }: ActivityDetailPageProps) {
+  const [localActivity, setLocalActivity] = useState<Activity>(activity);
+  const [deleteError, setDeleteError] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  async function handleToggleFavorite() {
+    try {
+      const newState = !localActivity.isFavorite;
+      await toggleFavorite(localActivity.id, newState);
+      setLocalActivity({ ...localActivity, isFavorite: newState });
+    } catch (error) {
+      console.error("[Detail] Error al cambiar favorito:", error);
+    }
+  }
+
+  const handleDeleteClick = () => {
+    console.log("[UI] Delete button clicked", activity.id);
+    setDeleteError("");
+    setShowDeleteConfirm(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      setIsDeleting(true);
+
+      console.log("[UI] Confirmed delete", activity.id);
+      console.log("[UI] Calling deleteActivity", activity.id);
+
+      await deleteActivity(activity.id);
+
+      console.log("[UI] Delete completed", activity.id);
+
+      setShowDeleteConfirm(false);
+      onDeleted();
+    } catch (error) {
+      console.error("[UI] Failed to delete activity", error);
+      setDeleteError("No se pudo eliminar la actividad. Revisa la consola.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <div className="detail-page">
       <div className="detail-header">
@@ -63,56 +109,56 @@ function ActivityDetailPage({ activity, onBack }: ActivityDetailPageProps) {
           ← Volver a búsqueda
         </button>
         <div className="detail-title-row">
-          <h1 className="detail-title">{activity.name}</h1>
-          {activity.isFavorite && <span className="detail-favorite">⭐ Favorita</span>}
+          <h1 className="detail-title">{localActivity.name}</h1>
+          {localActivity.isFavorite && <span className="detail-favorite">⭐ Favorita</span>}
         </div>
         <div className="detail-tags">
-          <span className="dtag">{getLabel(CLASS_MOMENTS, activity.classMoment)}</span>
-          <span className="dtag">{getLabel(PHYSICAL_CAPACITIES, activity.physicalCapacity)}</span>
-          <span className="dtag">{getLabel(INTENSITY_LEVELS, activity.intensity)}</span>
+          <span className="dtag">{getLabel(CLASS_MOMENTS, localActivity.classMoment)}</span>
+          <span className="dtag">{getLabel(PHYSICAL_CAPACITIES, localActivity.physicalCapacity)}</span>
+          <span className="dtag">{getLabel(INTENSITY_LEVELS, localActivity.intensity)}</span>
         </div>
       </div>
 
       <Section title="Información general">
-        <Field label="Objetivo principal" value={activity.primaryObjective} />
-        {activity.secondaryObjective && (
-          <Field label="Objetivo secundario" value={activity.secondaryObjective} />
+        <Field label="Objetivo principal" value={localActivity.primaryObjective} />
+        {localActivity.secondaryObjective && (
+          <Field label="Objetivo secundario" value={localActivity.secondaryObjective} />
         )}
       </Section>
 
       <Section title="Parámetros de ejecución">
         <div className="detail-grid">
-          <Field label="Participantes" value={`${activity.minParticipants} – ${activity.maxParticipants}`} />
-          <Field label="Duración" value={`${activity.durationMinutes} minutos`} />
-          <Field label="Intensidad" value={getLabel(INTENSITY_LEVELS, activity.intensity)} />
-          <Field label="Espacio" value={getLabel(SPACES, activity.space)} />
+          <Field label="Participantes" value={`${localActivity.minParticipants} – ${localActivity.maxParticipants}`} />
+          <Field label="Duración" value={`${localActivity.durationMinutes} minutos`} />
+          <Field label="Intensidad" value={getLabel(INTENSITY_LEVELS, localActivity.intensity)} />
+          <Field label="Espacio" value={getLabel(SPACES, localActivity.space)} />
         </div>
         <Field
           label="Cursos sugeridos"
           value={
-            activity.suggestedGrades.length > 0
-              ? activity.suggestedGrades.map(getGradeLabel).join(", ")
+            localActivity.suggestedGrades.length > 0
+              ? localActivity.suggestedGrades.map(getGradeLabel).join(", ")
               : "No especificado"
           }
         />
         <Field
           label="Implementos"
           value={
-            activity.equipment.length > 0
-              ? activity.equipment.map(getEquipmentLabel).join(", ")
+            localActivity.equipment.length > 0
+              ? localActivity.equipment.map(getEquipmentLabel).join(", ")
               : "Ninguno"
           }
         />
       </Section>
 
       <Section title="Contenido pedagógico">
-        <Field label="Descripción" value={activity.description} />
-        <Field label="Organización" value={activity.organization} />
-        {activity.variants.length > 0 && (
+        <Field label="Descripción" value={localActivity.description} />
+        <Field label="Organización" value={localActivity.organization} />
+        {localActivity.variants.length > 0 && (
           <div className="detail-field">
             <span className="detail-field-label">Variantes</span>
             <ul className="detail-list">
-              {activity.variants.map((v, i) => (
+              {localActivity.variants.map((v, i) => (
                 <li key={i}>{v}</li>
               ))}
             </ul>
@@ -121,12 +167,12 @@ function ActivityDetailPage({ activity, onBack }: ActivityDetailPageProps) {
       </Section>
 
       <Section title="Seguridad y evaluación">
-        <Field label="Notas de seguridad" value={activity.safetyNotes} />
-        {activity.observationCriteria.length > 0 && (
+        <Field label="Notas de seguridad" value={localActivity.safetyNotes} />
+        {localActivity.observationCriteria.length > 0 && (
           <div className="detail-field">
             <span className="detail-field-label">Criterios de observación</span>
             <ul className="detail-list">
-              {activity.observationCriteria.map((c, i) => (
+              {localActivity.observationCriteria.map((c, i) => (
                 <li key={i}>{c}</li>
               ))}
             </ul>
@@ -134,24 +180,71 @@ function ActivityDetailPage({ activity, onBack }: ActivityDetailPageProps) {
         )}
       </Section>
 
-      {activity.tags.length > 0 && (
+      {localActivity.tags.length > 0 && (
         <div className="detail-tags-footer">
-          {activity.tags.map((tag) => (
+          {localActivity.tags.map((tag) => (
             <span key={tag} className="dtag dtag-small">{tag}</span>
           ))}
         </div>
       )}
 
       <div className="detail-meta">
-        <span>Creado: {formatDate(activity.createdAt)}</span>
-        <span>Actualizado: {formatDate(activity.updatedAt)}</span>
+        <span>Creado: {formatDate(localActivity.createdAt)}</span>
+        <span>Actualizado: {formatDate(localActivity.updatedAt)}</span>
       </div>
 
       <div className="detail-actions">
-        <button className="detail-edit-btn" onClick={() => {}}>
+        <button className="detail-edit-btn" onClick={() => onEdit(localActivity)}>
           Editar actividad
         </button>
+        <button
+          className="detail-fav-btn"
+          onClick={handleToggleFavorite}
+        >
+          {localActivity.isFavorite ? "Quitar de favoritas" : "Marcar como favorita"}
+        </button>
+        <button
+          type="button"
+          className="detail-del-btn"
+          onClick={handleDeleteClick}
+          disabled={isDeleting}
+        >
+          {isDeleting ? "Eliminando..." : "Eliminar actividad"}
+        </button>
       </div>
+
+      {deleteError && (
+        <div className="detail-error">{deleteError}</div>
+      )}
+
+      {showDeleteConfirm && (
+        <div className="modal-overlay" onClick={() => setShowDeleteConfirm(false)}>
+          <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+            <h2 className="modal-title">Eliminar actividad</h2>
+            <p className="modal-text">
+              ¿Seguro que quieres eliminar la actividad «{activity.name}»? Esta acción no se puede deshacer.
+            </p>
+            <div className="modal-actions">
+              <button
+                type="button"
+                className="modal-cancel-btn"
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={isDeleting}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="modal-confirm-btn"
+                onClick={handleConfirmDelete}
+                disabled={isDeleting}
+              >
+                {isDeleting ? "Eliminando..." : "Eliminar definitivamente"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

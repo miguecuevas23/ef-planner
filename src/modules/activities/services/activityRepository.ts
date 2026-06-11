@@ -165,11 +165,23 @@ export async function updateActivity(activity: Activity): Promise<void> {
 }
 
 export async function deleteActivity(id: string): Promise<void> {
+  if (!id || id.trim() === "") {
+    throw new Error("deleteActivity recibió un id vacío");
+  }
+
   try {
+    console.log("[Activities] Deleting activity with id:", id);
     const database = await getDb();
-    await database.execute("DELETE FROM activities WHERE id = $1", [id]);
+
+    const result = await database.execute(
+      "DELETE FROM activities WHERE id = $1",
+      [id]
+    );
+
+    console.log("[Activities] Delete result:", result);
+    console.log("[Activities] Activity deleted:", id);
   } catch (error) {
-    console.error("[DB] Failed to delete activity:", error);
+    console.error("[Activities] Failed to delete activity:", error);
     throw error;
   }
 }

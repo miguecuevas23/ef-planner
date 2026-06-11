@@ -6,6 +6,7 @@ import { seedActivities } from "../services/seedActivities";
 import { mockActivities } from "../services/mockActivities";
 import ActivityCard from "../components/ActivityCard";
 import ActivityDetailPage from "./ActivityDetailPage";
+import ActivityFormPage from "./ActivityFormPage";
 import "./ActivitiesSearchPage.css";
 
 type PhysicalCapacityFilter = PhysicalCapacity | "";
@@ -23,34 +24,36 @@ function ActivitiesSearchPage({ onBack }: PageProps) {
   const [filterMoment, setFilterMoment] = useState("");
   const [selectedPhysicalCapacity, setSelectedPhysicalCapacity] = useState<PhysicalCapacityFilter>("");
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
+  const [editingActivity, setEditingActivity] = useState<Activity | null>(null);
+
+  async function loadActivities() {
+    try {
+      const dbOk = await testDatabaseConnection();
+      if (dbOk) {
+        await seedActivities();
+        const data = await getAllActivities();
+        setActivities(data);
+      } else {
+        setActivities([...mockActivities]);
+        setErrorMessage(
+          "No se pudo conectar con SQLite. Mostrando actividades de ejemplo temporalmente."
+        );
+      }
+    } catch {
+      setActivities([...mockActivities]);
+      setErrorMessage(
+        "No se pudo conectar con SQLite. Mostrando actividades de ejemplo temporalmente."
+      );
+    }
+  }
 
   useEffect(() => {
     let cancelled = false;
     async function load() {
       setIsLoading(true);
       setErrorMessage("");
-      try {
-        const dbOk = await testDatabaseConnection();
-        if (!cancelled && dbOk) {
-          await seedActivities();
-          const data = await getAllActivities();
-          if (!cancelled) setActivities(data);
-        } else if (!cancelled) {
-          setActivities([...mockActivities]);
-          setErrorMessage(
-            "No se pudo conectar con SQLite. Mostrando actividades de ejemplo temporalmente."
-          );
-        }
-      } catch {
-        if (!cancelled) {
-          setActivities([...mockActivities]);
-          setErrorMessage(
-            "No se pudo conectar con SQLite. Mostrando actividades de ejemplo temporalmente."
-          );
-        }
-      } finally {
-        if (!cancelled) setIsLoading(false);
-      }
+      await loadActivities();
+      if (!cancelled) setIsLoading(false);
     }
     load();
     return () => { cancelled = true; };
@@ -74,11 +77,36 @@ function ActivitiesSearchPage({ onBack }: PageProps) {
     });
   }, [searchText, filterMoment, selectedPhysicalCapacity, activities]);
 
+  async function handleEditSaved() {
+    setEditingActivity(null);
+    setSelectedActivity(null);
+    await loadActivities();
+  }
+
+  async function handleDeleted() {
+    console.log("[UI] Reloading activities after delete");
+    setSelectedActivity(null);
+    await loadActivities();
+    console.log("[UI] Activities reloaded after delete");
+  }
+
+  if (editingActivity) {
+    return (
+      <ActivityFormPage
+        activityToEdit={editingActivity}
+        onBack={() => setEditingActivity(null)}
+        onSaved={handleEditSaved}
+      />
+    );
+  }
+
   if (selectedActivity) {
     return (
       <ActivityDetailPage
         activity={selectedActivity}
         onBack={() => setSelectedActivity(null)}
+        onEdit={(activity) => setEditingActivity(activity)}
+        onDeleted={handleDeleted}
       />
     );
   }
@@ -119,22 +147,14 @@ function ActivitiesSearchPage({ onBack }: PageProps) {
         />
 
         <div className="search-filters">
-          <select
-            className="search-filter"
-            value={filterMoment}
-            onChange={(e) => setFilterMoment(e.target.value)}
-          >
+          <select className="search-filter" value={filterMoment} onChange={(e) => setFilterMoment(e.target.value)}>
             <option value="">Todos los momentos</option>
             {CLASS_MOMENTS.map((m) => (
               <option key={m.value} value={m.value}>{m.label}</option>
             ))}
           </select>
 
-          <select
-            className="search-filter"
-            value={selectedPhysicalCapacity}
-            onChange={(e) => setSelectedPhysicalCapacity(e.target.value as PhysicalCapacityFilter)}
-          >
+          <select className="search-filter" value={selectedPhysicalCapacity} onChange={(e) => setSelectedPhysicalCapacity(e.target.value as PhysicalCapacityFilter)}>
             <option value="">Todas las capacidades</option>
             {PHYSICAL_CAPACITIES.map((c) => (
               <option key={c.value} value={c.value}>{c.label}</option>
@@ -154,11 +174,7 @@ function ActivitiesSearchPage({ onBack }: PageProps) {
       ) : (
         <div className="activities-list">
           {filteredActivities.map((activity) => (
-            <ActivityCard
-              key={activity.id}
-              activity={activity}
-              onViewDetail={setSelectedActivity}
-            />
+            <ActivityCard key={activity.id} activity={activity} onViewDetail={setSelectedActivity} />
           ))}
         </div>
       )}

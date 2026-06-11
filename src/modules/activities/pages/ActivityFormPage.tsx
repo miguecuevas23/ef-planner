@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Activity, ClassMoment, PhysicalCapacity, IntensityLevel, Space } from "../types/activity";
 import { CLASS_MOMENTS, PHYSICAL_CAPACITIES, INTENSITY_LEVELS, SPACES } from "../../../shared/constants/pedagogicalOptions";
-import { createActivity } from "../services/activityRepository";
+import { createActivity, updateActivity } from "../services/activityRepository";
 import "./ActivityFormPage.css";
 
 interface PageProps {
   onBack: () => void;
+  activityToEdit?: Activity;
+  onSaved?: () => void;
 }
 
 interface FieldErrors {
@@ -28,7 +30,9 @@ function parseCommaList(input: string): string[] {
     .filter(Boolean);
 }
 
-function ActivityFormPage({ onBack }: PageProps) {
+function ActivityFormPage({ onBack, activityToEdit, onSaved }: PageProps) {
+  const isEditing = !!activityToEdit;
+
   const [name, setName] = useState("");
   const [classMoment, setClassMoment] = useState<ClassMoment | "">("");
   const [primaryObjective, setPrimaryObjective] = useState("");
@@ -51,9 +55,30 @@ function ActivityFormPage({ onBack }: PageProps) {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [successMessage, setSuccessMessage] = useState("");
 
+  useEffect(() => {
+    if (!activityToEdit) return;
+    setName(activityToEdit.name);
+    setClassMoment(activityToEdit.classMoment);
+    setPrimaryObjective(activityToEdit.primaryObjective);
+    setSecondaryObjective(activityToEdit.secondaryObjective ?? "");
+    setPhysicalCapacity(activityToEdit.physicalCapacity);
+    setMinParticipants(String(activityToEdit.minParticipants));
+    setMaxParticipants(String(activityToEdit.maxParticipants));
+    setSuggestedGrades(activityToEdit.suggestedGrades.join(", "));
+    setDurationMinutes(String(activityToEdit.durationMinutes));
+    setIntensity(activityToEdit.intensity);
+    setSpace(activityToEdit.space);
+    setEquipment(activityToEdit.equipment.join(", "));
+    setDescription(activityToEdit.description);
+    setOrganization(activityToEdit.organization);
+    setVariants(activityToEdit.variants.join(", "));
+    setSafetyNotes(activityToEdit.safetyNotes);
+    setObservationCriteria(activityToEdit.observationCriteria.join(", "));
+    setTags(activityToEdit.tags.join(", "));
+  }, [activityToEdit]);
+
   function validate(): boolean {
     const e: FieldErrors = {};
-
     if (!name.trim()) e.name = "El nombre es obligatorio.";
     if (!classMoment) e.classMoment = "Selecciona un momento de la clase.";
     if (!primaryObjective.trim()) e.primaryObjective = "El objetivo principal es obligatorio.";
@@ -81,12 +106,11 @@ function ActivityFormPage({ onBack }: PageProps) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSuccessMessage("");
-
     if (!validate()) return;
 
     const now = new Date().toISOString();
     const activity: Activity = {
-      id: crypto.randomUUID(),
+      id: activityToEdit ? activityToEdit.id : crypto.randomUUID(),
       name: name.trim(),
       classMoment: classMoment as ClassMoment,
       primaryObjective: primaryObjective.trim(),
@@ -105,34 +129,19 @@ function ActivityFormPage({ onBack }: PageProps) {
       safetyNotes: safetyNotes.trim(),
       observationCriteria: parseCommaList(observationCriteria),
       tags: parseCommaList(tags),
-      isFavorite: false,
-      createdAt: now,
+      isFavorite: activityToEdit ? activityToEdit.isFavorite : false,
+      createdAt: activityToEdit ? activityToEdit.createdAt : now,
       updatedAt: now,
     };
 
     try {
-      await createActivity(activity);
-      setSuccessMessage("Actividad guardada correctamente.");
-      // Limpiar formulario
-      setName("");
-      setClassMoment("");
-      setPrimaryObjective("");
-      setSecondaryObjective("");
-      setPhysicalCapacity("");
-      setMinParticipants("");
-      setMaxParticipants("");
-      setSuggestedGrades("");
-      setDurationMinutes("");
-      setIntensity("");
-      setSpace("");
-      setEquipment("");
-      setDescription("");
-      setOrganization("");
-      setVariants("");
-      setSafetyNotes("");
-      setObservationCriteria("");
-      setTags("");
-      setErrors({});
+      if (isEditing) {
+        await updateActivity(activity);
+      } else {
+        await createActivity(activity);
+      }
+      setSuccessMessage(isEditing ? "Actividad actualizada correctamente." : "Actividad guardada correctamente.");
+      if (onSaved) setTimeout(() => onSaved(), 800);
     } catch (error) {
       console.error("[Form] No se pudo guardar la actividad:", error);
       alert("No se pudo guardar la actividad. Revisa la consola.");
@@ -142,8 +151,10 @@ function ActivityFormPage({ onBack }: PageProps) {
   return (
     <div className="form-page">
       <div className="form-page-header">
-        <h1 className="form-page-title">Nueva actividad</h1>
-        <p className="form-page-subtitle">Completa los campos para crear una actividad pedagógica</p>
+        <h1 className="form-page-title">{isEditing ? "Editar actividad" : "Nueva actividad"}</h1>
+        <p className="form-page-subtitle">
+          {isEditing ? "Modifica los campos de la actividad" : "Completa los campos para crear una actividad pedagógica"}
+        </p>
       </div>
 
       <form className="activity-form" onSubmit={handleSubmit}>
@@ -265,7 +276,7 @@ function ActivityFormPage({ onBack }: PageProps) {
 
           <div className="form-field">
             <label className="form-label">Organización</label>
-            <textarea className="form-input form-textarea" placeholder="Cómo se organizan los estudiantes, formaciones, distribución..." rows={2} value={organization} onChange={(e) => setOrganization(e.target.value)} />
+            <textarea className="form-input form-textarea" placeholder="Cómo se organizan los estudiantes..." rows={2} value={organization} onChange={(e) => setOrganization(e.target.value)} />
           </div>
 
           <div className="form-field">
@@ -289,10 +300,14 @@ function ActivityFormPage({ onBack }: PageProps) {
           </div>
         </div>
 
-        <button type="submit" className="form-submit-btn">Guardar actividad</button>
+        <button type="submit" className="form-submit-btn">
+          {isEditing ? "Guardar cambios" : "Guardar actividad"}
+        </button>
       </form>
 
-      <button className="back-btn" onClick={onBack}>← Volver</button>
+      <button className="back-btn" onClick={onBack}>
+        ← {isEditing ? "Cancelar edición" : "Volver"}
+      </button>
     </div>
   );
 }
