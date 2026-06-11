@@ -37,9 +37,9 @@
   "plugins": {
     "updater": {
       "endpoints": [
-        "https://TU_SERVIDOR_AQUI/latest.json"
+        "https://github.com/miguecuevas23/ef-planner.git/releases/latest/download/latest.json"
       ],
-      "pubkey": "TU_PUBKEY_AQUI"
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDU5NzEzQUEwQUMzODg0MjgKUldRb2hEaXNvRHB4V2N1bWFxN2VnWUFtMFdiQ09QSG1HMHhwQUF4RVNFMlZDVXErbC8wYzFYUUQKMiguels-"
     }
   }
 }
