@@ -2,15 +2,17 @@ import { check } from "@tauri-apps/plugin-updater";
 import { APP_VERSION } from "../../../shared/constants/appVersion";
 import { UpdateCheckResult } from "../types/update";
 
-export async function checkForUpdates(): Promise<UpdateCheckResult> {
-  const hasEndpoint = false; // Cambiar a true cuando se configure el servidor
+function isUpdaterConfigured(): boolean {
+  return true;
+}
 
-  if (!hasEndpoint) {
+export async function checkForUpdates(): Promise<UpdateCheckResult> {
+  if (!isUpdaterConfigured()) {
     return {
       status: "not_configured",
       currentVersion: APP_VERSION,
       message:
-        "El sistema de actualizaciones está preparado, pero aún no hay servidor de actualizaciones configurado.",
+        "Actualizaciones preparadas, pero falta configurar claves y GitHub Releases.",
     };
   }
 
