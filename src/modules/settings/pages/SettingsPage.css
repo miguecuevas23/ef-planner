@@ -99,3 +99,58 @@
   line-height: 1.5;
   margin-bottom: 1rem;
 }
+
+.settings-update-btn {
+  padding: 0.35rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #ffffff;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.settings-update-btn:hover {
+  transform: translateY(-1px);
+}
+
+.settings-update-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.settings-update-msg {
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  margin: 0.5rem 0;
+}
+
+.settings-update-not_configured {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.settings-update-checking {
+  background: rgba(102, 126, 234, 0.15);
+  color: #667eea;
+}
+
+.settings-update-available {
+  background: rgba(72, 199, 142, 0.15);
+  color: #48c78e;
+}
+
+.settings-update-not_available {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.settings-update-error {
+  background: rgba(255, 107, 107, 0.15);
+  color: #ff6b6b;
+}

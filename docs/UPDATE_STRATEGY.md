@@ -33,7 +33,7 @@ app_metadata             → versión de esquema, flags
 app_settings             → preferencias del usuario
 ```
 
-## Flujo de actualización (futuro con Tauri Updater)
+## Flujo de actualización con Tauri Updater
 
 ```
 1. App detecta nueva versión
@@ -43,6 +43,10 @@ app_settings             → preferencias del usuario
 5. Si schema_version < actual, ejecuta migraciones incrementales
 6. App lista con datos intactos
 ```
+
+Las actualizaciones son **siempre opcionales**. El usuario decide cuándo buscar y cuándo instalar. Nunca se fuerza una actualización automática.
+
+Las actualizaciones **solo reemplazan el binario** de la app. No tocan SQLite, no sincronizan datos, no borran actividades ni favoritas.
 
 ## Para testers (versión beta)
 

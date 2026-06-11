@@ -7,6 +7,8 @@ import {
   getUpdateChannel,
   setUpdateChannel,
 } from "../services/updatePreferencesService";
+import { checkForUpdates } from "../services/updateService";
+import { UpdateStatus } from "../types/update";
 import "../../activities/pages/ActivitiesSearchPage.css";
 import "./SettingsPage.css";
 
@@ -18,6 +20,8 @@ function SettingsPage({ onBack }: PageProps) {
   const [schemaVersion, setSchemaVersion] = useState<number>(0);
   const [checkUpdates, setCheckUpdates] = useState(true);
   const [channel, setChannel] = useState<"beta" | "stable">("beta");
+  const [updateStatus, setUpdateStatus] = useState<UpdateStatus>("idle");
+  const [updateMessage, setUpdateMessage] = useState("");
 
   useEffect(() => {
     async function load() {
@@ -40,6 +44,14 @@ function SettingsPage({ onBack }: PageProps) {
   async function handleChannelChange(value: "beta" | "stable") {
     await setUpdateChannel(value);
     setChannel(value);
+  }
+
+  async function handleCheckUpdates() {
+    setUpdateStatus("checking");
+    setUpdateMessage("Buscando actualizaciones...");
+    const result = await checkForUpdates();
+    setUpdateStatus(result.status);
+    setUpdateMessage(result.message);
   }
 
   return (
@@ -70,7 +82,25 @@ function SettingsPage({ onBack }: PageProps) {
         <h2 className="settings-section-title">Actualizaciones</h2>
 
         <div className="settings-field">
-          <span className="settings-label">Buscar actualizaciones al iniciar</span>
+          <span className="settings-label">Buscar actualizaciones</span>
+          <button
+            type="button"
+            className="settings-update-btn"
+            onClick={handleCheckUpdates}
+            disabled={updateStatus === "checking" || updateStatus === "installing"}
+          >
+            {updateStatus === "checking" ? "Buscando..." : "Buscar actualizaciones"}
+          </button>
+        </div>
+
+        {updateMessage && (
+          <div className={`settings-update-msg settings-update-${updateStatus}`}>
+            {updateMessage}
+          </div>
+        )}
+
+        <div className="settings-field">
+          <span className="settings-label">Buscar al iniciar</span>
           <button
             type="button"
             className={`settings-toggle ${checkUpdates ? "active" : ""}`}
@@ -81,7 +111,7 @@ function SettingsPage({ onBack }: PageProps) {
         </div>
 
         <div className="settings-field">
-          <span className="settings-label">Canal de actualizaciones</span>
+          <span className="settings-label">Canal</span>
           <div className="settings-channel-group">
             <button
               type="button"
