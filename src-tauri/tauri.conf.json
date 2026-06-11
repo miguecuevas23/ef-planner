@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "ef-planner",
-  "version": "0.1.0",
-  "identifier": "com.ef-planner.app",
+  "productName": "EF Planner",
+  "version": "1.1.0",
+  "identifier": "com.efplanner.app",
   "build": {
     "beforeDevCommand": "pnpm dev",
     "devUrl": "http://localhost:1420",
@@ -13,7 +13,7 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "ef-planner",
+        "title": "EF Planner",
         "width": 800,
         "height": 600
       }

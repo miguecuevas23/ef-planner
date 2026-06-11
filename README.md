@@ -29,6 +29,29 @@ pnpm tauri dev
 pnpm tauri build
 ```
 
+## Build beta para testers
+
+Para generar la app instalable `.dmg`:
+
+```bash
+pnpm tauri build
+```
+
+El archivo se genera en:
+```
+src-tauri/target/release/bundle/dmg/EF Planner_1.1.0_aarch64.dmg
+```
+
+La app también queda en:
+```
+src-tauri/target/release/bundle/macos/EF Planner.app
+```
+
+- `pnpm tauri dev` es para desarrollo con hot-reload.
+- `pnpm tauri build` genera la app instalable para distribuir.
+- Los datos locales del usuario se conservan entre actualizaciones.
+- Se recomienda exportar respaldo JSON antes de probar versiones beta.
+
 ## Funcionalidades (v1.1)
 
 - Dashboard con navegación a todos los módulos

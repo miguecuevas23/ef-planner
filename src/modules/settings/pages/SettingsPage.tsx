@@ -46,7 +46,7 @@ function SettingsPage({ onBack }: PageProps) {
     <div className="search-page">
       <div className="search-page-header">
         <h1 className="search-page-title">Configuración</h1>
-        <p className="search-page-subtitle">Preferencias de la aplicación</p>
+        <p className="search-page-subtitle">Versión beta para pruebas internas</p>
       </div>
 
       <div className="settings-section">
@@ -102,7 +102,7 @@ function SettingsPage({ onBack }: PageProps) {
       </div>
 
       <div className="settings-note">
-        Las actualizaciones nunca deben borrar tus actividades guardadas. Tus datos están protegidos en SQLite local y no se modifican durante las actualizaciones.
+        Versión beta para pruebas internas. Las actualizaciones nunca deben borrar tus actividades guardadas. Tus datos están protegidos en SQLite local.
       </div>
 
       <button className="back-btn" onClick={onBack}>← Volver</button>
