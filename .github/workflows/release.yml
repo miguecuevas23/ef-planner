@@ -38,12 +38,13 @@ jobs:
       - name: Restore Tauri updater private key
         run: |
           mkdir -p "$HOME/.tauri"
-          echo "${{ secrets.TAURI_SIGNING_PRIVATE_KEY_B64 }}" | base64 --decode > "$HOME/.tauri/ef-planner-updater.key"
+          echo "${{ secrets.TAURI_SIGNING_PRIVATE_KEY_B64 }}" | base64 -D > "$HOME/.tauri/ef-planner-updater.key"
           chmod 600 "$HOME/.tauri/ef-planner-updater.key"
+
           {
-            echo "TAURI_SIGNING_PRIVATE_KEY<<EOF"
+            echo "TAURI_SIGNING_PRIVATE_KEY<<__TAURI_PRIVATE_KEY__"
             cat "$HOME/.tauri/ef-planner-updater.key"
-            echo "EOF"
+            printf '\n__TAURI_PRIVATE_KEY__\n'
           } >> "$GITHUB_ENV"
 
       - name: Build and release Tauri app
