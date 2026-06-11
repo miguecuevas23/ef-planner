@@ -1,3 +1,4 @@
+HEAD
 # EF Planner
 
 Biblioteca pedagógica offline para profesores de Educación Física. Aplicación de escritorio que permite crear, buscar, editar, eliminar y respaldar actividades pedagógicas sin conexión a internet.
@@ -79,3 +80,6 @@ EF Planner es **local-first**. Los datos residen en SQLite local y nunca se borr
 - Exportación a PDF
 - Actualizaciones automáticas con Tauri Updater
 - Sincronización opcional entre dispositivos
+# ef-planner
+App for Teachers of the Phisical Education
+origin/main
