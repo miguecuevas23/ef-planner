@@ -9,6 +9,7 @@ import {
   SUGGESTED_GRADES,
 } from "../../../shared/constants/pedagogicalOptions";
 import { toggleFavorite, deleteActivity } from "../services/activityRepository";
+import HomeButton from "../../../shared/components/HomeButton";
 import "./ActivityDetailPage.css";
 
 interface ActivityDetailPageProps {
@@ -100,6 +101,7 @@ function ActivityDetailPage({ activity, onBack, onEdit, onDeleted }: ActivityDet
         <button className="back-btn" onClick={onBack}>
           ← Volver a búsqueda
         </button>
+        <HomeButton onClick={onBack} />
         <div className="detail-title-row">
           <h1 className="detail-title">{localActivity.name}</h1>
           {localActivity.isFavorite && <span className="detail-favorite">⭐ Favorita</span>}

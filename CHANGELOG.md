@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.1-beta
+
+- Agregado botón Inicio/Home en las páginas internas para volver rápidamente al menú principal.
+- Preparada versión beta 1.2.1 para prueba de actualización desde 1.2.0-beta.
+- Ajustado endpoint beta del updater hacia v1.2.1-beta.
+
 ## 1.2.0-beta
 
 - Agregado mensaje de confirmación al modificar actividades.

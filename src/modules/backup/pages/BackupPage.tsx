@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { exportActivitiesBackup, importActivitiesBackup } from "../services/backupService";
 import { ImportResult } from "../types/backup";
+import HomeButton from "../../../shared/components/HomeButton";
 import "../../activities/pages/ActivitiesSearchPage.css";
 import "./BackupPage.css";
 
@@ -66,6 +67,7 @@ function BackupPage({ onBack }: PageProps) {
     <div className="search-page">
       <div className="search-page-header">
         <button className="back-btn" onClick={onBack}>← Volver</button>
+        <HomeButton onClick={onBack} />
         <h1 className="search-page-title">Respaldos</h1>
         <p className="search-page-subtitle">Exporta o importa tus actividades pedagógicas</p>
       </div>

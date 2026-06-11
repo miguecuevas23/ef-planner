@@ -7,6 +7,7 @@ import { mockActivities } from "../services/mockActivities";
 import ActivityCard from "../components/ActivityCard";
 import ActivityDetailPage from "./ActivityDetailPage";
 import ActivityFormPage from "./ActivityFormPage";
+import HomeButton from "../../../shared/components/HomeButton";
 import "./ActivitiesSearchPage.css";
 
 type PhysicalCapacityFilter = PhysicalCapacity | "";
@@ -125,6 +126,7 @@ function ActivitiesSearchPage({ onBack }: PageProps) {
   return (
     <div className="search-page">
       <div className="search-page-header">
+        <HomeButton onClick={onBack} />
         <h1 className="search-page-title">Buscar actividades</h1>
         <p className="search-page-subtitle">Encuentra actividades pedagógicas para tu clase</p>
       </div>

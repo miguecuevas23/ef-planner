@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Activity, ClassMoment, PhysicalCapacity, IntensityLevel, Space } from "../types/activity";
 import { CLASS_MOMENTS, PHYSICAL_CAPACITIES, INTENSITY_LEVELS, SPACES, SUGGESTED_GRADES } from "../../../shared/constants/pedagogicalOptions";
 import { createActivity, updateActivity } from "../services/activityRepository";
+import HomeButton from "../../../shared/components/HomeButton";
 import "./ActivityFormPage.css";
 
 interface PageProps {
@@ -170,6 +171,7 @@ function ActivityFormPage({ onBack, activityToEdit, onSaved }: PageProps) {
         <button className="back-btn" onClick={onBack}>
           ← {isEditing ? "Cancelar edición" : "Volver"}
         </button>
+        <HomeButton onClick={onBack} />
         <h1 className="form-page-title">{isEditing ? "Editar actividad" : "Nueva actividad"}</h1>
         <p className="form-page-subtitle">
           {isEditing ? "Modifica los campos de la actividad" : "Completa los campos para crear una actividad pedagógica"}

@@ -3,6 +3,7 @@ import { Activity } from "../../activities/types/activity";
 import { getAllActivities } from "../../activities/services/activityRepository";
 import ActivityCard from "../../activities/components/ActivityCard";
 import ActivityDetailPage from "../../activities/pages/ActivityDetailPage";
+import HomeButton from "../../../shared/components/HomeButton";
 import "../../activities/pages/ActivitiesSearchPage.css";
 
 interface PageProps {
@@ -56,7 +57,8 @@ function FavoritesPage({ onBack }: PageProps) {
     return (
       <div className="search-page">
         <div className="search-page-header">
-          <h1 className="search-page-title">Favoritas</h1>
+        <HomeButton onClick={onBack} />
+        <h1 className="search-page-title">Favoritas</h1>
         </div>
         <div className="search-empty">
           <p>Cargando actividades...</p>

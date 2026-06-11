@@ -24,3 +24,20 @@
   background: #ffffff;
   transform: scale(1.05);
 }
+
+.home-btn {
+  padding: 0.4rem 1rem;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.home-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}

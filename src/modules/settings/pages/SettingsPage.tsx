@@ -9,6 +9,7 @@ import {
 } from "../services/updatePreferencesService";
 import { checkForUpdates } from "../services/updateService";
 import { UpdateStatus } from "../types/update";
+import HomeButton from "../../../shared/components/HomeButton";
 import "../../activities/pages/ActivitiesSearchPage.css";
 import "./SettingsPage.css";
 
@@ -58,6 +59,7 @@ function SettingsPage({ onBack }: PageProps) {
     <div className="search-page">
       <div className="search-page-header">
         <button className="back-btn" onClick={onBack}>← Volver</button>
+        <HomeButton onClick={onBack} />
         <h1 className="search-page-title">Configuración</h1>
         <p className="search-page-subtitle">Versión beta para pruebas internas</p>
       </div>
