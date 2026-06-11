@@ -237,6 +237,10 @@ function ActivityDetailPage({ activity, onBack, onEdit, onDeleted }: ActivityDet
           </div>
         </div>
       )}
+
+      <button className="back-btn" onClick={onBack}>
+        ← Volver a búsqueda
+      </button>
     </div>
   );
 }

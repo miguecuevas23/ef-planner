@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Activity, ClassMoment, PhysicalCapacity, IntensityLevel, Space } from "../types/activity";
-import { CLASS_MOMENTS, PHYSICAL_CAPACITIES, INTENSITY_LEVELS, SPACES } from "../../../shared/constants/pedagogicalOptions";
+import { CLASS_MOMENTS, PHYSICAL_CAPACITIES, INTENSITY_LEVELS, SPACES, SUGGESTED_GRADES } from "../../../shared/constants/pedagogicalOptions";
 import { createActivity, updateActivity } from "../services/activityRepository";
 import "./ActivityFormPage.css";
 
@@ -40,7 +40,7 @@ function ActivityFormPage({ onBack, activityToEdit, onSaved }: PageProps) {
   const [physicalCapacity, setPhysicalCapacity] = useState<PhysicalCapacity | "">("");
   const [minParticipants, setMinParticipants] = useState<string>("");
   const [maxParticipants, setMaxParticipants] = useState<string>("");
-  const [suggestedGrades, setSuggestedGrades] = useState("");
+  const [suggestedGrades, setSuggestedGrades] = useState<string[]>([]);
   const [durationMinutes, setDurationMinutes] = useState<string>("");
   const [intensity, setIntensity] = useState<IntensityLevel | "">("");
   const [space, setSpace] = useState<Space | "">("");
@@ -64,7 +64,7 @@ function ActivityFormPage({ onBack, activityToEdit, onSaved }: PageProps) {
     setPhysicalCapacity(activityToEdit.physicalCapacity);
     setMinParticipants(String(activityToEdit.minParticipants));
     setMaxParticipants(String(activityToEdit.maxParticipants));
-    setSuggestedGrades(activityToEdit.suggestedGrades.join(", "));
+    setSuggestedGrades(activityToEdit.suggestedGrades);
     setDurationMinutes(String(activityToEdit.durationMinutes));
     setIntensity(activityToEdit.intensity);
     setSpace(activityToEdit.space);
@@ -76,6 +76,22 @@ function ActivityFormPage({ onBack, activityToEdit, onSaved }: PageProps) {
     setObservationCriteria(activityToEdit.observationCriteria.join(", "));
     setTags(activityToEdit.tags.join(", "));
   }, [activityToEdit]);
+
+  const allGradesSelected = suggestedGrades.length === SUGGESTED_GRADES.length;
+
+  function handleToggleAllGrades() {
+    if (allGradesSelected) {
+      setSuggestedGrades([]);
+    } else {
+      setSuggestedGrades(SUGGESTED_GRADES.map((g) => g.value));
+    }
+  }
+
+  function handleToggleGrade(value: string) {
+    setSuggestedGrades((prev) =>
+      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
+    );
+  }
 
   function validate(): boolean {
     const e: FieldErrors = {};
@@ -118,7 +134,7 @@ function ActivityFormPage({ onBack, activityToEdit, onSaved }: PageProps) {
       physicalCapacity: physicalCapacity as PhysicalCapacity,
       minParticipants: Number(minParticipants),
       maxParticipants: Number(maxParticipants),
-      suggestedGrades: parseCommaList(suggestedGrades),
+      suggestedGrades,
       durationMinutes: Number(durationMinutes),
       intensity: intensity as IntensityLevel,
       space: space as Space,
@@ -140,7 +156,7 @@ function ActivityFormPage({ onBack, activityToEdit, onSaved }: PageProps) {
       } else {
         await createActivity(activity);
       }
-      setSuccessMessage(isEditing ? "Actividad actualizada correctamente." : "Actividad guardada correctamente.");
+      setSuccessMessage(isEditing ? "Actividad modificada correctamente." : "Actividad guardada correctamente.");
       if (onSaved) setTimeout(() => onSaved(), 800);
     } catch (error) {
       console.error("[Form] No se pudo guardar la actividad:", error);
@@ -151,6 +167,9 @@ function ActivityFormPage({ onBack, activityToEdit, onSaved }: PageProps) {
   return (
     <div className="form-page">
       <div className="form-page-header">
+        <button className="back-btn" onClick={onBack}>
+          ← {isEditing ? "Cancelar edición" : "Volver"}
+        </button>
         <h1 className="form-page-title">{isEditing ? "Editar actividad" : "Nueva actividad"}</h1>
         <p className="form-page-subtitle">
           {isEditing ? "Modifica los campos de la actividad" : "Completa los campos para crear una actividad pedagógica"}
@@ -207,8 +226,23 @@ function ActivityFormPage({ onBack, activityToEdit, onSaved }: PageProps) {
           </div>
 
           <div className="form-field">
-            <label className="form-label">Cursos sugeridos (separados por coma)</label>
-            <input type="text" className="form-input" placeholder="Ej: 5° básico, 6° básico, 7° básico" value={suggestedGrades} onChange={(e) => setSuggestedGrades(e.target.value)} />
+            <label className="form-label">Cursos sugeridos</label>
+            <button type="button" className="form-select-all-btn" onClick={handleToggleAllGrades}>
+              {allGradesSelected ? "Deseleccionar todos" : "Seleccionar todos los cursos"}
+            </button>
+            <div className="form-checkbox-group">
+              {SUGGESTED_GRADES.map((g) => (
+                <label key={g.value} className="form-checkbox-label">
+                  <input
+                    type="checkbox"
+                    className="form-checkbox"
+                    checked={suggestedGrades.includes(g.value)}
+                    onChange={() => handleToggleGrade(g.value)}
+                  />{" "}
+                  {g.label}
+                </label>
+              ))}
+            </div>
           </div>
         </div>
 

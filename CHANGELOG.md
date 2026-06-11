@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.0-beta
+
+- Agregado mensaje de confirmación al modificar actividades.
+- Agregado botón Volver arriba y abajo en pantallas largas.
+- Mejorada selección de cursos mediante casillas y opción seleccionar todos.
+- Corregido contraste visual del mensaje de actualización.
+- Preparada versión beta 1.2.0 para distribución por GitHub Releases.
+
 ## 1.1.0-beta — Versión para testers
 
 - Base SQLite protegida con migraciones incrementales.

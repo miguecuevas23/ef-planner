@@ -57,6 +57,7 @@ function SettingsPage({ onBack }: PageProps) {
   return (
     <div className="search-page">
       <div className="search-page-header">
+        <button className="back-btn" onClick={onBack}>← Volver</button>
         <h1 className="search-page-title">Configuración</h1>
         <p className="search-page-subtitle">Versión beta para pruebas internas</p>
       </div>

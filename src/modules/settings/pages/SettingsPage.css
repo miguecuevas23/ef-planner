@@ -147,7 +147,7 @@
 
 .settings-update-not_available {
   background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.8);
+  color: #1a1a2e;
 }
 
 .settings-update-error {

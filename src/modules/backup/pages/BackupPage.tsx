@@ -65,6 +65,7 @@ function BackupPage({ onBack }: PageProps) {
   return (
     <div className="search-page">
       <div className="search-page-header">
+        <button className="back-btn" onClick={onBack}>← Volver</button>
         <h1 className="search-page-title">Respaldos</h1>
         <p className="search-page-subtitle">Exporta o importa tus actividades pedagógicas</p>
       </div>

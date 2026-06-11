@@ -100,12 +100,32 @@
   gap: 0.3rem;
   font-size: 0.85rem;
   color: #555;
-  cursor: not-allowed;
+  cursor: pointer;
 }
 
 .form-checkbox {
-  cursor: not-allowed;
-  opacity: 0.5;
+  cursor: pointer;
+  opacity: 1;
+}
+
+.form-select-all-btn {
+  padding: 0.3rem 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #667eea;
+  background: #fafafa;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  margin-bottom: 0.5rem;
+}
+
+.form-select-all-btn:hover {
+  background: #667eea;
+  color: #ffffff;
+  border-color: #667eea;
 }
 
 .form-submit-btn {
