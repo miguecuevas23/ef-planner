@@ -168,9 +168,21 @@
   color: var(--color-success);
 }
 
-@media (max-width: 500px) {
+@media (max-width: 600px) {
+  .form-page-title {
+    font-size: 1.5rem;
+  }
+
   .form-row {
     flex-direction: column;
     gap: 0;
+  }
+
+  .form-section {
+    padding: 1rem;
+  }
+
+  .form-submit-btn {
+    width: 100%;
   }
 }

@@ -41,3 +41,13 @@
 .home-btn:hover {
   background: rgba(255, 255, 255, 0.3);
 }
+
+@media (max-width: 600px) {
+  .back-btn {
+    width: 100%;
+  }
+
+  .home-btn {
+    width: 100%;
+  }
+}

@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.3.1-beta
+
+- Mejorada adaptación visual de la app en ventanas pequeñas.
+- Agregado scroll vertical en páginas con contenido largo.
+- Mejorado comportamiento responsive de grillas, formularios y tablas.
+- Agregada edición de actividades importadas antes de guardarlas.
+- Agregada revalidación después de modificar actividades en la vista previa.
+- Mejorada corrección de advertencias y errores durante la importación.
+- Mantenido endpoint permanente updater-beta.
+
 ## 1.3.0-beta
 
 - Agregado módulo "Importar actividades".

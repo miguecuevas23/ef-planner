@@ -412,3 +412,181 @@
   color: var(--color-error);
   font-weight: 500;
 }
+
+@media (max-width: 600px) {
+  .import-select-card {
+    padding: 1.5rem 1rem;
+  }
+
+  .import-actions-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .import-actions-btns {
+    flex-direction: column;
+  }
+
+  .import-btn-sm {
+    width: 100%;
+  }
+
+  .import-bottom-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .import-bottom-bar .back-btn {
+    width: 100%;
+    margin-top: 0;
+  }
+
+  .import-btn-large {
+    width: 100%;
+  }
+
+  .col-grades,
+  .col-moment,
+  .col-capacity {
+    display: none;
+  }
+}
+
+/* ------------------------------------------------
+   Edit mode styles for import preview modal
+   ------------------------------------------------ */
+
+.import-edit-modal {
+  max-width: 560px;
+  max-height: 80vh;
+  overflow-y: auto;
+  text-align: left;
+}
+
+.import-edit-modal .modal-title {
+  text-align: center;
+}
+
+.import-edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.import-edit-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.import-edit-input {
+  width: 100%;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  color: var(--color-text);
+  background: var(--color-bg);
+  outline: none;
+}
+
+.import-edit-textarea {
+  resize: vertical;
+  min-height: 50px;
+}
+
+.import-edit-select {
+  width: 100%;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  color: var(--color-text);
+  background: var(--color-bg);
+  outline: none;
+  cursor: pointer;
+}
+
+.import-edit-grades {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.75rem;
+}
+
+.import-edit-grade-label {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  cursor: pointer;
+}
+
+.import-edit-grade-label input[type="checkbox"] {
+  cursor: pointer;
+}
+
+.import-edit-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.import-edit-save-btn {
+  padding: 0.5rem 1.25rem;
+  background: var(--color-primary);
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.import-edit-save-btn:hover {
+  background: var(--color-primary-dark);
+}
+
+.import-edit-cancel-btn {
+  padding: 0.5rem 1.25rem;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.import-edit-cancel-btn:hover {
+  background: var(--color-border);
+}
+
+@media (max-width: 600px) {
+  .import-edit-modal {
+    max-width: 95vw;
+    max-height: 85vh;
+    padding: 1.25rem;
+  }
+
+  .import-edit-actions {
+    flex-direction: column;
+  }
+
+  .import-edit-save-btn,
+  .import-edit-cancel-btn {
+    width: 100%;
+  }
+}

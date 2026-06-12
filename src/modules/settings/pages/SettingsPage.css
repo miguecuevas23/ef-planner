@@ -226,3 +226,19 @@
   background: rgba(22, 163, 74, 0.12);
   color: var(--color-primary);
 }
+
+@media (max-width: 600px) {
+  .settings-section {
+    padding: 1rem;
+  }
+
+  .settings-field {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .settings-update-install-btn {
+    font-size: 0.85rem;
+  }
+}

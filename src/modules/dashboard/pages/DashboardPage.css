@@ -66,12 +66,32 @@
   color: var(--color-text);
 }
 
-@media (max-width: 500px) {
-  .cards-grid {
-    grid-template-columns: 1fr;
+@media (max-width: 600px) {
+  .container {
+    padding: 1rem;
+    gap: 2rem;
   }
 
   .title {
-    font-size: 2.25rem;
+    font-size: 2rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .cards-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .card {
+    padding: 1rem 0.5rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .cards-grid {
+    grid-template-columns: 1fr;
   }
 }

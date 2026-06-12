@@ -100,3 +100,18 @@
   background: var(--color-primary);
   color: #ffffff;
 }
+
+@media (max-width: 600px) {
+  .activity-card {
+    padding: 1rem;
+  }
+
+  .activity-card-details {
+    grid-template-columns: 1fr;
+  }
+
+  .activity-card-button {
+    align-self: stretch;
+    text-align: center;
+  }
+}

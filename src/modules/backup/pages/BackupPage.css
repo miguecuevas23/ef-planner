@@ -95,3 +95,13 @@
   background: rgba(255, 255, 255, 0.1);
   color: rgba(255, 255, 255, 0.85);
 }
+
+@media (max-width: 600px) {
+  .backup-card {
+    padding: 1.5rem 1rem;
+  }
+
+  .backup-btn {
+    width: 100%;
+  }
+}

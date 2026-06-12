@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { getAllActivities, createActivity } from "../../activities/services/activityRepository";
-import { ImportPreviewItem, ImportFileType } from "../types/importTypes";
+import { ImportPreviewItem, ImportFileType, ImportActivity } from "../types/importTypes";
 import { parseJsonFile, parseTxtFile } from "../services/importParsers";
 import { normalizeActivity, detectDuplicates } from "../services/importValidators";
 import ImportPreviewTable from "../components/ImportPreviewTable";
@@ -111,6 +111,44 @@ function ImportActivitiesPage({ onBack }: PageProps) {
     setDetailItem(null);
   }
 
+  async function handleSaveEdit(index: number, editedData: ImportActivity) {
+    const existingActivities = await getAllActivities();
+    const existingNames = new Set(existingActivities.map((a) => a.name.toLowerCase().trim()));
+
+    setPreviewItems((prev) =>
+      prev.map((item) => {
+        if (item.index !== index) return item;
+
+        const merged: ImportActivity = {
+          title: editedData.title ?? item.raw.title,
+          description: editedData.description ?? item.raw.description,
+          objective: editedData.objective ?? item.raw.objective,
+          moment: editedData.moment ?? item.raw.moment,
+          physicalCapacity: editedData.physicalCapacity ?? item.raw.physicalCapacity,
+          intensity: editedData.intensity ?? item.raw.intensity,
+          space: editedData.space ?? item.raw.space,
+          materials: editedData.materials ?? item.raw.materials,
+          minStudents: editedData.minStudents ?? item.raw.minStudents,
+          suggestedGrades: editedData.suggestedGrades ?? item.raw.suggestedGrades,
+        };
+
+        const revalidated = normalizeActivity(merged, index);
+
+        if (revalidated.activity) {
+          const name = revalidated.activity.name.toLowerCase().trim();
+          if (existingNames.has(name)) {
+            revalidated.isDuplicate = true;
+            revalidated.status = "duplicate";
+            revalidated.warnings.push("Posible duplicado: ya existe una actividad con el mismo título.");
+          }
+        }
+
+        revalidated.selected = revalidated.status !== "error";
+        return revalidated;
+      })
+    );
+  }
+
   async function handleImportSelected() {
     const selected = previewItems.filter((i) => i.selected && i.activity);
     if (selected.length === 0) return;
@@ -190,6 +228,7 @@ function ImportActivitiesPage({ onBack }: PageProps) {
           onSelectAll={handleSelectAll}
           onDeselectAll={handleDeselectAll}
           onViewDetail={handleViewDetail}
+          onSaveEdit={handleSaveEdit}
         />
 
         <div className="import-bottom-bar">
