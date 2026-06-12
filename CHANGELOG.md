@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.3.0-beta
+
+- Agregado módulo "Importar actividades".
+- Agregada importación desde JSON estructurado.
+- Agregada importación desde TXT estructurado.
+- Agregada vista previa antes de guardar actividades importadas.
+- Agregada validación de campos obligatorios.
+- Agregada detección simple de posibles duplicados.
+- Agregada opción para importar solo actividades seleccionadas.
+- Se mantiene PDF e IA fuera de esta versión.
+- Mantenido endpoint permanente updater-beta.
+
 ## 1.2.5-beta
 
 - Agregado soporte para logo interno de EF Planner.

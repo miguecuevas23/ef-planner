@@ -17,6 +17,7 @@ function DashboardPage({ onNavigate }: DashboardPageProps) {
       <section className="cards-grid">
         <DashboardCard title="Buscar actividades" icon="🔍" onClick={() => onNavigate("search")} />
         <DashboardCard title="Nueva actividad" icon="➕" onClick={() => onNavigate("new")} />
+        <DashboardCard title="Importar actividades" icon="📥" onClick={() => onNavigate("import")} />
         <DashboardCard title="Favoritas" icon="⭐" onClick={() => onNavigate("favorites")} />
         <DashboardCard title="Respaldos" icon="💾" onClick={() => onNavigate("backups")} />
         <DashboardCard title="Configuración" icon="⚙️" onClick={() => onNavigate("settings")} />

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import logoUrl from "../../assets/ef-planner-logo.png";
 import logoUrlSvg from "../../assets/ef-planner-logo.svg";
 import "./Logo.css";
 
@@ -7,11 +8,11 @@ interface LogoProps {
 }
 
 function Logo({ size = "large" }: LogoProps) {
-  const [imgError, setImgError] = useState(false);
+  const [source, setSource] = useState<"png" | "svg" | "text">("png");
 
-  if (imgError) {
+  if (source === "text") {
     return (
-      <div className="logo">
+      <div className="app-brand">
         <span className={`logo-fallback logo-fallback-${size}`}>
           <span className="logo-fallback-icon">🏃</span>
           EF Planner
@@ -21,12 +22,18 @@ function Logo({ size = "large" }: LogoProps) {
   }
 
   return (
-    <div className="logo">
+    <div className="app-brand">
       <img
-        className={`logo-img logo-${size}`}
-        src={logoUrlSvg}
+        className={`app-logo logo-${size}`}
+        src={source === "png" ? logoUrl : logoUrlSvg}
         alt="EF Planner"
-        onError={() => setImgError(true)}
+        onError={() => {
+          if (source === "png") {
+            setSource("svg");
+          } else {
+            setSource("text");
+          }
+        }}
       />
     </div>
   );

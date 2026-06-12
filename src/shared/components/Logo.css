@@ -1,21 +1,21 @@
-.logo {
-  display: inline-flex;
+.app-brand {
+  display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 12px;
 }
 
-.logo-img {
-  height: auto;
+.app-logo {
+  height: 56px;
+  width: auto;
   object-fit: contain;
 }
 
-.logo-img.logo-large {
-  width: 280px;
-  max-width: 90vw;
+.app-logo.logo-large {
+  height: 64px;
 }
 
-.logo-img.logo-small {
-  width: 180px;
+.app-logo.logo-small {
+  height: 40px;
 }
 
 .logo-fallback {
@@ -28,11 +28,11 @@
 }
 
 .logo-fallback-large {
-  font-size: 3rem;
+  font-size: 2.5rem;
 }
 
 .logo-fallback-small {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
 }
 
 .logo-fallback-icon {

@@ -4,12 +4,13 @@ import ActivitiesSearchPage from "./modules/activities/pages/ActivitiesSearchPag
 import ActivityFormPage from "./modules/activities/pages/ActivityFormPage";
 import FavoritesPage from "./modules/favorites/pages/FavoritesPage";
 import BackupPage from "./modules/backup/pages/BackupPage";
+import ImportActivitiesPage from "./modules/import/pages/ImportActivitiesPage";
 import SettingsPage from "./modules/settings/pages/SettingsPage";
 import StorageSetupModal from "./modules/settings/components/StorageSetupModal";
 import { getSetting } from "./database/metadataRepository";
 import "./shared/components/Shared.css";
 
-type Page = "dashboard" | "search" | "new" | "favorites" | "backups" | "settings";
+type Page = "dashboard" | "search" | "new" | "import" | "favorites" | "backups" | "settings";
 
 function App() {
   const [activePage, setActivePage] = useState<Page>("dashboard");
@@ -48,6 +49,8 @@ function App() {
       return <ActivityFormPage onBack={handleBack} />;
     case "favorites":
       return <FavoritesPage onBack={handleBack} />;
+    case "import":
+      return <ImportActivitiesPage onBack={handleBack} />;
     case "backups":
       return <BackupPage onBack={handleBack} />;
     case "settings":
