@@ -1,11 +1,12 @@
 .activity-card {
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--color-surface);
   border-radius: 12px;
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
 }
 
 .activity-card-header {
@@ -17,7 +18,7 @@
 .activity-card-name {
   font-size: 1.125rem;
   font-weight: 700;
-  color: #1a1a2e;
+  color: var(--color-text);
 }
 
 .activity-card-favorite {
@@ -35,17 +36,17 @@
   border-radius: 6px;
   font-size: 0.8rem;
   font-weight: 500;
-  background: #667eea;
+  background: var(--color-primary);
   color: #ffffff;
 }
 
 .tag:nth-child(2) {
-  background: #764ba2;
+  background: var(--color-secondary);
 }
 
 .tag:nth-child(3) {
-  background: #f093fb;
-  color: #1a1a2e;
+  background: var(--color-accent);
+  color: #ffffff;
 }
 
 .activity-card-details {
@@ -63,18 +64,18 @@
 .detail-label {
   font-size: 0.75rem;
   font-weight: 500;
-  color: #888;
+  color: var(--color-muted);
   text-transform: uppercase;
 }
 
 .detail-value {
   font-size: 0.875rem;
-  color: #1a1a2e;
+  color: var(--color-text);
 }
 
 .activity-card-description {
   font-size: 0.875rem;
-  color: #555;
+  color: var(--color-muted);
   line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -86,16 +87,16 @@
   align-self: flex-end;
   padding: 0.4rem 1rem;
   background: transparent;
-  border: 1px solid #667eea;
+  border: 1px solid var(--color-primary);
   border-radius: 8px;
   font-size: 0.85rem;
   font-weight: 500;
-  color: #667eea;
+  color: var(--color-primary);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .activity-card-button:hover {
-  background: #667eea;
+  background: var(--color-primary);
   color: #ffffff;
 }

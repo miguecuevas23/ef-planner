@@ -1,4 +1,5 @@
 import DashboardCard from "../components/DashboardCard";
+import Logo from "../../../shared/components/Logo";
 import "./DashboardPage.css";
 
 interface DashboardPageProps {
@@ -9,7 +10,7 @@ function DashboardPage({ onNavigate }: DashboardPageProps) {
   return (
     <main className="container">
       <header className="header">
-        <h1 className="title">EF Planner</h1>
+        <Logo size="large" />
         <p className="subtitle">Biblioteca pedagógica para clases de Educación Física</p>
       </header>
 

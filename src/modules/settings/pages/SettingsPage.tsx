@@ -12,6 +12,7 @@ import { checkForUpdates, downloadAndInstallUpdate } from "../services/updateSer
 import { UpdateStatus } from "../types/update";
 import { open } from "@tauri-apps/plugin-dialog";
 import HomeButton from "../../../shared/components/HomeButton";
+import Logo from "../../../shared/components/Logo";
 import "../../activities/pages/ActivitiesSearchPage.css";
 import "./SettingsPage.css";
 
@@ -112,6 +113,8 @@ function SettingsPage({ onBack }: PageProps) {
       </div>
 
       <div className="settings-section">
+        <Logo size="small" />
+
         <div className="settings-field">
           <span className="settings-label">Versión de la app</span>
           <span className="settings-value">{APP_VERSION}</span>

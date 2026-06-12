@@ -31,17 +31,17 @@
 .search-input {
   width: 100%;
   padding: 0.7rem 1rem;
-  border: none;
+  border: 1px solid var(--color-border);
   border-radius: 10px;
   font-size: 0.95rem;
   font-family: inherit;
-  background: rgba(255, 255, 255, 0.95);
-  color: #1a1a2e;
+  background: var(--color-surface);
+  color: var(--color-text);
   outline: none;
 }
 
 .search-input::placeholder {
-  color: #999;
+  color: var(--color-muted);
 }
 
 .search-filters {
@@ -52,18 +52,18 @@
 .search-filter {
   flex: 1;
   padding: 0.5rem 0.75rem;
-  border: none;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   font-size: 0.85rem;
   font-family: inherit;
-  background: rgba(255, 255, 255, 0.95);
-  color: #1a1a2e;
+  background: var(--color-surface);
+  color: var(--color-text);
   outline: none;
   cursor: pointer;
 }
 
 .search-filter option {
-  color: #1a1a2e;
+  color: var(--color-text);
 }
 
 .search-results-count {

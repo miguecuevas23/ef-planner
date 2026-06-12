@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 80" width="360" height="80">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#16A34A"/>
+      <stop offset="100%" stop-color="#0F172A"/>
+    </linearGradient>
+  </defs>
+  <circle cx="36" cy="40" r="30" fill="#16A34A"/>
+  <text x="36" y="47" text-anchor="middle" fill="#FFFFFF" font-family="Segoe UI, system-ui, sans-serif" font-size="22" font-weight="800">EF</text>
+  <text x="80" y="47" fill="#FFFFFF" font-family="Segoe UI, system-ui, sans-serif" font-size="26" font-weight="700">EF Planner</text>
+</svg>

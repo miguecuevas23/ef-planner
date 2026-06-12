@@ -5,12 +5,26 @@
 }
 
 :root {
+  --color-primary: #16A34A;
+  --color-primary-dark: #15803D;
+  --color-secondary: #0F172A;
+  --color-accent: #F97316;
+  --color-bg: #F8FAFC;
+  --color-surface: #FFFFFF;
+  --color-text: #0F172A;
+  --color-muted: #64748B;
+  --color-border: #E2E8F0;
+  --color-success: #16A34A;
+  --color-warning: #F59E0B;
+  --color-error: #DC2626;
+  --color-info: #2563EB;
+
   font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
   font-size: 16px;
   line-height: 1.5;
   font-weight: 400;
-  color: #1a1a2e;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: var(--color-text);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;

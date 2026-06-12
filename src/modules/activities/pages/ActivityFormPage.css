@@ -28,18 +28,19 @@
 }
 
 .form-section {
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--color-surface);
   border-radius: 12px;
   padding: 1.5rem;
+  border: 1px solid var(--color-border);
 }
 
 .form-section-title {
   font-size: 1rem;
   font-weight: 700;
-  color: #667eea;
+  color: var(--color-primary);
   margin-bottom: 1rem;
   padding-bottom: 0.5rem;
-  border-bottom: 2px solid rgba(102, 126, 234, 0.15);
+  border-bottom: 2px solid var(--color-border);
 }
 
 .form-row {
@@ -61,7 +62,7 @@
 .form-label {
   font-size: 0.8rem;
   font-weight: 600;
-  color: #555;
+  color: var(--color-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -69,12 +70,12 @@
 .form-input {
   width: 100%;
   padding: 0.6rem 0.75rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   font-size: 0.9rem;
   font-family: inherit;
-  color: #1a1a2e;
-  background: #fafafa;
+  color: var(--color-text);
+  background: var(--color-bg);
   outline: none;
 }
 
@@ -99,7 +100,7 @@
   align-items: center;
   gap: 0.3rem;
   font-size: 0.85rem;
-  color: #555;
+  color: var(--color-muted);
   cursor: pointer;
 }
 
@@ -110,12 +111,12 @@
 
 .form-select-all-btn {
   padding: 0.3rem 0.75rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border);
   border-radius: 6px;
   font-size: 0.8rem;
   font-weight: 600;
-  color: #667eea;
-  background: #fafafa;
+  color: var(--color-primary);
+  background: var(--color-bg);
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: inherit;
@@ -123,14 +124,14 @@
 }
 
 .form-select-all-btn:hover {
-  background: #667eea;
+  background: var(--color-primary);
   color: #ffffff;
-  border-color: #667eea;
+  border-color: var(--color-primary);
 }
 
 .form-submit-btn {
   padding: 0.75rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
   border: none;
   border-radius: 10px;
   font-size: 1rem;
@@ -143,7 +144,7 @@
 
 .form-submit-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 15px rgba(22, 163, 74, 0.4);
 }
 
 .form-submit-btn:active {
@@ -152,19 +153,19 @@
 
 .form-error {
   font-size: 0.8rem;
-  color: #ff6b6b;
+  color: var(--color-error);
   margin-top: 0.2rem;
 }
 
 .form-success {
   text-align: center;
   padding: 0.75rem 1rem;
-  background: rgba(72, 199, 142, 0.2);
-  border: 1px solid rgba(72, 199, 142, 0.4);
+  background: rgba(22, 163, 74, 0.12);
+  border: 1px solid var(--color-success);
   border-radius: 10px;
   font-size: 0.9rem;
   font-weight: 600;
-  color: #48c78e;
+  color: var(--color-success);
 }
 
 @media (max-width: 500px) {

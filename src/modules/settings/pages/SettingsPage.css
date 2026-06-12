@@ -1,17 +1,18 @@
 .settings-section {
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--color-surface);
   border-radius: 12px;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
+  border: 1px solid var(--color-border);
 }
 
 .settings-section-title {
   font-size: 1rem;
   font-weight: 700;
-  color: #667eea;
+  color: var(--color-primary);
   margin-bottom: 1rem;
   padding-bottom: 0.5rem;
-  border-bottom: 2px solid rgba(102, 126, 234, 0.15);
+  border-bottom: 2px solid var(--color-border);
 }
 
 .settings-field {
@@ -22,18 +23,18 @@
 }
 
 .settings-field + .settings-field {
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  border-top: 1px solid var(--color-border);
 }
 
 .settings-label {
   font-size: 0.9rem;
-  color: #1a1a2e;
+  color: var(--color-text);
   font-weight: 500;
 }
 
 .settings-value {
   font-size: 0.9rem;
-  color: #888;
+  color: var(--color-muted);
   font-weight: 500;
 }
 
@@ -42,27 +43,28 @@
   font-weight: 600;
   padding: 0.2rem 0.75rem;
   border-radius: 6px;
-  background: #764ba2;
+  background: var(--color-secondary);
   color: #ffffff;
   text-transform: uppercase;
 }
 
 .settings-toggle {
   padding: 0.35rem 1rem;
-  border: none;
+  border: 1px solid var(--color-border);
   border-radius: 6px;
   font-size: 0.8rem;
   font-weight: 600;
-  color: #888;
-  background: #f0f0f0;
+  color: var(--color-muted);
+  background: var(--color-bg);
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: inherit;
 }
 
 .settings-toggle.active {
-  background: #667eea;
+  background: var(--color-primary);
   color: #ffffff;
+  border-color: var(--color-primary);
 }
 
 .settings-channel-group {
@@ -72,20 +74,20 @@
 
 .settings-channel-btn {
   padding: 0.35rem 1rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border);
   border-radius: 6px;
   font-size: 0.8rem;
   font-weight: 600;
-  color: #888;
-  background: #fafafa;
+  color: var(--color-muted);
+  background: var(--color-bg);
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: inherit;
 }
 
 .settings-channel-btn.active {
-  border-color: #667eea;
-  background: #667eea;
+  border-color: var(--color-primary);
+  background: var(--color-primary);
   color: #ffffff;
 }
 
@@ -107,7 +109,7 @@
   font-size: 0.8rem;
   font-weight: 600;
   color: #ffffff;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: inherit;
@@ -132,34 +134,35 @@
 
 .settings-update-not_configured {
   background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .settings-update-checking {
-  background: rgba(102, 126, 234, 0.15);
-  color: #667eea;
+  background: rgba(22, 163, 74, 0.12);
+  color: var(--color-primary);
 }
 
 .settings-update-available {
-  background: rgba(72, 199, 142, 0.15);
-  color: #48c78e;
+  background: rgba(22, 163, 74, 0.12);
+  color: var(--color-success);
 }
 
 .settings-update-not_available {
   background: rgba(255, 255, 255, 0.1);
-  color: #1a1a2e;
+  color: var(--color-text);
 }
 
 .settings-update-error {
-  background: rgba(255, 107, 107, 0.15);
-  color: #ff6b6b;
+  background: rgba(220, 38, 38, 0.1);
+  color: var(--color-error);
 }
 
 .settings-update-card {
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--color-surface);
   border-radius: 10px;
   padding: 1rem;
   margin: 0.5rem 0;
+  border: 1px solid var(--color-border);
 }
 
 .update-card-row {
@@ -167,20 +170,20 @@
   justify-content: space-between;
   padding: 0.3rem 0;
   font-size: 0.85rem;
-  color: #1a1a2e;
+  color: var(--color-text);
 }
 
 .update-card-new {
   font-weight: 700;
-  color: #764ba2;
+  color: var(--color-accent);
 }
 
 .update-card-notes {
   margin-top: 0.5rem;
   padding-top: 0.5rem;
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  border-top: 1px solid var(--color-border);
   font-size: 0.8rem;
-  color: #666;
+  color: var(--color-muted);
   line-height: 1.4;
 }
 
@@ -190,7 +193,7 @@
 
 .update-card-warning {
   font-size: 0.8rem;
-  color: #888;
+  color: var(--color-muted);
   margin: 0.5rem 0;
   font-style: italic;
 }
@@ -203,7 +206,7 @@
   font-size: 0.9rem;
   font-weight: 700;
   color: #ffffff;
-  background: linear-gradient(135deg, #48c78e 0%, #38b278 100%);
+  background: linear-gradient(135deg, var(--color-success) 0%, #15803D 100%);
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: inherit;
@@ -211,7 +214,7 @@
 
 .settings-update-install-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(72, 199, 142, 0.3);
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
 }
 
 .update-card-progress {
@@ -220,6 +223,6 @@
   border-radius: 8px;
   font-size: 0.85rem;
   font-weight: 600;
-  background: rgba(102, 126, 234, 0.15);
-  color: #667eea;
+  background: rgba(22, 163, 74, 0.12);
+  color: var(--color-primary);
 }

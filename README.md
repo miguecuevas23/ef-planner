@@ -44,7 +44,17 @@ El `.dmg` se genera en `src-tauri/target/release/bundle/dmg/`. La app también q
 - Los datos locales del usuario se conservan entre actualizaciones
 - Se recomienda exportar respaldo JSON antes de probar versiones beta
 
-## Funcionalidades (v1.2.3-beta)
+## Ícono de la app
+
+Para regenerar los íconos de la app a partir de una imagen fuente, coloca tu archivo `app-icon.png` en la raíz del proyecto y ejecuta:
+
+```bash
+pnpm tauri icon app-icon.png
+```
+
+Esto regenerará todos los tamaños de íconos en `src-tauri/icons/`.
+
+## Funcionalidades (v1.2.5-beta)
 
 ### Biblioteca de actividades
 - CRUD completo de actividades pedagógicas

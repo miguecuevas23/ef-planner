@@ -38,17 +38,18 @@
   justify-content: center;
   gap: 0.75rem;
   padding: 1.5rem 1rem;
-  background: rgba(255, 255, 255, 0.95);
-  border: none;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 16px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
 }
 
 .card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+  border-color: var(--color-primary);
 }
 
 .card:active {
@@ -62,7 +63,7 @@
 .card-title {
   font-size: 1rem;
   font-weight: 600;
-  color: #1a1a2e;
+  color: var(--color-text);
 }
 
 @media (max-width: 500px) {

@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.5-beta
+
+- Agregado soporte para logo interno de EF Planner.
+- Preparada integración de ícono real de la app mediante Tauri icon.
+- Ajustada paleta visual para una identidad más profesional y educativa.
+- Mejorado contraste visual en botones, tarjetas y mensajes.
+- Mantenido endpoint permanente updater-beta.
+
 ## 1.2.4-beta
 
 - Establecido valor por defecto de 2 estudiantes mínimos al crear una nueva actividad.
