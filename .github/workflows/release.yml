@@ -13,6 +13,7 @@ jobs:
 
     strategy:
       fail-fast: false
+      max-parallel: 1
       matrix:
         include:
           - os: macos-latest
@@ -70,7 +71,7 @@ jobs:
         run: chmod 600 "${{ runner.temp }}/ef-planner-updater.key"
 
       - name: Build Tauri app
-        uses: tauri-apps/tauri-action@v0
+        uses: tauri-apps/tauri-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ runner.temp }}/ef-planner-updater.key
@@ -78,9 +79,13 @@ jobs:
         with:
           tagName: ${{ github.ref_name }}
           releaseName: "EF Planner ${{ github.ref_name }}"
-          releaseBody: "Versión beta de EF Planner para testers."
-          prerelease: true
+          releaseBody: "Versión beta multiplataforma de EF Planner."
           releaseDraft: false
+          prerelease: true
+          uploadUpdaterJson: true
+          uploadUpdaterSignatures: true
+          updaterJsonPreferNsis: true
+          retryAttempts: 2
           args: --target ${{ matrix.target }}
 
   publish-updater:
