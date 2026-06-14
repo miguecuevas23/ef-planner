@@ -58,28 +58,22 @@ jobs:
         with:
           targets: ${{ matrix.target }}
 
-      - name: Restore updater signing key
-        shell: bash
-        run: |
-          mkdir -p "$HOME/.tauri"
-          echo "$KEY_B64" > /tmp/key.b64
-          node -e "
-            const fs = require('fs');
-            const key = Buffer.from(fs.readFileSync('/tmp/key.b64','utf8').trim(), 'base64').toString();
-            fs.writeFileSync(process.env.HOME + '/.tauri/ef-planner-updater.key', key);
-          "
-          chmod 600 "$HOME/.tauri/ef-planner-updater.key"
-          echo "TAURI_SIGNING_PRIVATE_KEY<<EOF" >> "$GITHUB_ENV"
-          cat "$HOME/.tauri/ef-planner-updater.key" >> "$GITHUB_ENV"
-          echo "EOF" >> "$GITHUB_ENV"
+      - name: Restore Tauri updater private key
         env:
           KEY_B64: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_B64 }}
+          KEY_PATH: ${{ runner.temp }}/ef-planner-updater.key
+        run: |
+          node -e "const fs = require('fs'); fs.writeFileSync(process.env.KEY_PATH, Buffer.from(process.env.KEY_B64, 'base64'));"
+
+      - name: Protect updater private key
+        if: runner.os != 'Windows'
+        run: chmod 600 "${{ runner.temp }}/ef-planner-updater.key"
 
       - name: Build Tauri app
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ runner.temp }}/ef-planner-updater.key
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           tagName: ${{ github.ref_name }}
