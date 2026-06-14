@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.4.0-beta
+
+- Preparada distribución inicial para Windows x64 mediante NSIS.
+- Preparada distribución inicial para Linux x64 mediante AppImage.
+- Mantenida distribución para macOS Apple Silicon.
+- Preparado workflow multiplataforma en GitHub Actions.
+- Preparado latest.json multiplataforma para canal updater-beta.
+- Mantenido endpoint permanente updater-beta.
+
 ## 1.3.1-beta
 
 - Mejorada adaptación visual de la app en ventanas pequeñas.
