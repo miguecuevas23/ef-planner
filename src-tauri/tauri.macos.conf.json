@@ -1,4 +1,9 @@
 {
+  "bundle": {
+    "active": true,
+    "targets": ["dmg"],
+    "createUpdaterArtifacts": true
+  },
   "plugins": {
     "updater": {
       "endpoints": [
