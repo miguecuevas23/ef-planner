@@ -67,16 +67,20 @@ jobs:
           echo "Relevant macOS artifacts:"
 
           find src-tauri/target \
-            -type f \
-            \( \
-              -name '*.dmg' \
-              -o -name '*.app.tar.gz' \
-              -o -name '*.app.tar.gz.sig' \
-            \) \
+            \( -type d -name '*.app' -o \
+               -type f -name '*.dmg' -o \
+               -type f -name '*.app.tar.gz' -o \
+               -type f -name '*.app.tar.gz.sig' \) \
             -print
 
+          APP_BUNDLE="$(find src-tauri/target -type d -name '*.app' -print -quit)"
           DMG="$(find src-tauri/target -type f -name '*.dmg' -print -quit)"
           ARCHIVE="$(find src-tauri/target -type f -name '*.app.tar.gz' -print -quit)"
+
+          if [ -z "${APP_BUNDLE}" ] || [ ! -d "${APP_BUNDLE}" ]; then
+            echo "ERROR: macOS .app bundle was not generated."
+            exit 1
+          fi
 
           if [ -z "${DMG}" ] || [ ! -f "${DMG}" ]; then
             echo "ERROR: macOS DMG was not generated."
