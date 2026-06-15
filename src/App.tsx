@@ -6,11 +6,13 @@ import FavoritesPage from "./modules/favorites/pages/FavoritesPage";
 import BackupPage from "./modules/backup/pages/BackupPage";
 import ImportActivitiesPage from "./modules/import/pages/ImportActivitiesPage";
 import SettingsPage from "./modules/settings/pages/SettingsPage";
+import PlanningComingSoonPage from "./modules/planning/pages/PlanningComingSoonPage";
 import StorageSetupModal from "./modules/settings/components/StorageSetupModal";
 import { getSetting } from "./database/metadataRepository";
+import { initializePlanningModule } from "./modules/planning/services/planningRepository";
 import "./shared/components/Shared.css";
 
-type Page = "dashboard" | "search" | "new" | "import" | "favorites" | "backups" | "settings";
+type Page = "dashboard" | "search" | "new" | "import" | "favorites" | "planning" | "backups" | "settings";
 
 function App() {
   const [activePage, setActivePage] = useState<Page>("dashboard");
@@ -26,6 +28,8 @@ function App() {
       setSetupChecked(true);
     }
     check();
+
+    initializePlanningModule().catch(() => {});
   }, []);
 
   const handleNavigate = (page: string) => {
@@ -51,6 +55,8 @@ function App() {
       return <FavoritesPage onBack={handleBack} />;
     case "import":
       return <ImportActivitiesPage onBack={handleBack} />;
+    case "planning":
+      return <PlanningComingSoonPage onBack={handleBack} />;
     case "backups":
       return <BackupPage onBack={handleBack} />;
     case "settings":

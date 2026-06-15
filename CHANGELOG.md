@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.5.0-beta
+
+- Preparada la arquitectura inicial del futuro planificador de clases.
+- Agregada base SQLite independiente ef_planner_planning.db.
+- Agregadas tablas iniciales para planificaciones, bloques y actividades.
+- Agregado control de esquema independiente para planificación.
+- Agregada tarjeta "Planificación" en el dashboard.
+- Agregada pantalla informativa "Próximamente".
+- Preparado feature flag para habilitar el módulo en EF Planner 2.0.
+- Mantenida intacta la biblioteca actual de actividades.
+- Mantenidos canales de actualización separados por plataforma.
+
 ## 1.4.0-beta
 
 - Preparada distribución inicial para Windows x64 mediante NSIS.
