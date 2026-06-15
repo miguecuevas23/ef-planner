@@ -1,0 +1,131 @@
+name: Release EF Planner — macOS
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*-beta-macos"
+
+jobs:
+  build:
+    permissions:
+      contents: write
+
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin
+
+      - name: Restore Tauri updater private key
+        env:
+          KEY_B64: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_B64 }}
+          KEY_PATH: ${{ runner.temp }}/ef-planner-updater.key
+        run: |
+          node -e "const fs = require('fs'); fs.writeFileSync(process.env.KEY_PATH, Buffer.from(process.env.KEY_B64, 'base64'));"
+
+      - name: Protect updater private key
+        run: chmod 600 "${{ runner.temp }}/ef-planner-updater.key"
+
+      - name: Build Tauri app
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ runner.temp }}/ef-planner-updater.key
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: "EF Planner ${{ github.ref_name }}"
+          releaseBody: "Versión beta de EF Planner para macOS."
+          releaseDraft: false
+          prerelease: true
+          uploadUpdaterJson: true
+          uploadUpdaterSignatures: true
+          retryAttempts: 2
+          args: --target aarch64-apple-darwin
+
+      - name: Capture macOS updater JSON
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          New-Item -ItemType Directory -Force "platform-json" | Out-Null
+
+          gh release download "${{ github.ref_name }}" `
+            --repo "${{ github.repository }}" `
+            --pattern "latest.json" `
+            --dir "platform-json" `
+            --clobber
+
+          if (-not (Test-Path "platform-json/latest.json")) {
+            throw "latest.json was not found after macOS build"
+          }
+
+          Copy-Item `
+            "platform-json/latest.json" `
+            "platform-json/latest-darwin-aarch64.json"
+
+      - name: Validate and prepare macOS latest.json
+        shell: bash
+        run: |
+          node -e "
+            const fs = require('fs');
+            const data = JSON.parse(fs.readFileSync('platform-json/latest-darwin-aarch64.json', 'utf8'));
+            const platforms = data.platforms || {};
+
+            if (!platforms['darwin-aarch64'] && platforms['darwin-aarch64-app']) {
+              platforms['darwin-aarch64'] = platforms['darwin-aarch64-app'];
+            }
+
+            const entry = platforms['darwin-aarch64'];
+            if (!entry) throw new Error('Missing darwin-aarch64 platform in latest.json');
+            if (!entry.url) throw new Error('darwin-aarch64 missing url');
+            if (!entry.signature) throw new Error('darwin-aarch64 missing signature');
+
+            data.platforms = platforms;
+            fs.writeFileSync('updater-channel/latest.json', JSON.stringify(data, null, 2) + '\n');
+            console.log('macOS updater version:', data.version);
+            console.log('macOS platforms:', Object.keys(platforms).sort().join(', '));
+          "
+
+      - name: Ensure updater-macos-beta release exists
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release view updater-macos-beta \
+            --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1 || \
+          gh release create updater-macos-beta \
+            --repo "${GITHUB_REPOSITORY}" \
+            --target main \
+            --title "EF Planner macOS Beta Updater Channel" \
+            --prerelease \
+            --notes "Canal permanente de actualizaciones beta de EF Planner para macOS."
+
+      - name: Upload latest.json to updater-macos-beta
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload updater-macos-beta \
+            updater-channel/latest.json \
+            --repo "${GITHUB_REPOSITORY}" \
+            --clobber

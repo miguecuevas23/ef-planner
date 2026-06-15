@@ -1,10 +1,10 @@
-name: Release EF Planner
+name: Release EF Planner — Windows & Linux
 
 on:
   workflow_dispatch:
   push:
     tags:
-      - "v*"
+      - "v*-beta-windows-linux"
 
 jobs:
   build:
@@ -16,18 +16,12 @@ jobs:
       max-parallel: 1
       matrix:
         include:
-          - os: macos-latest
-            target: aarch64-apple-darwin
-            platform: darwin-aarch64
-            bundler: dmg
           - os: windows-latest
             target: x86_64-pc-windows-msvc
             platform: windows-x86_64
-            bundler: nsis
           - os: ubuntu-22.04
             target: x86_64-unknown-linux-gnu
             platform: linux-x86_64
-            bundler: appimage
 
     runs-on: ${{ matrix.os }}
 
@@ -79,7 +73,7 @@ jobs:
         with:
           tagName: ${{ github.ref_name }}
           releaseName: "EF Planner ${{ github.ref_name }}"
-          releaseBody: "Versión beta multiplataforma de EF Planner."
+          releaseBody: "Versión beta de EF Planner para Windows y Linux."
           releaseDraft: false
           prerelease: true
           uploadUpdaterJson: true
@@ -139,7 +133,7 @@ jobs:
           echo "Platform JSON files:"
           find updater-jsons -maxdepth 2 -type f -name "*.json" -print
 
-      - name: Merge platform JSONs into latest.json
+      - name: Merge and validate Windows/Linux latest.json
         shell: bash
         run: |
           node -e "
@@ -148,7 +142,6 @@ jobs:
 
             const inputDir = 'updater-jsons';
             const outputDir = 'updater-channel';
-
             fs.mkdirSync(outputDir, { recursive: true });
 
             let files = [];
@@ -161,13 +154,12 @@ jobs:
             }
             walk(inputDir);
 
-            if (files.length < 3) {
-              throw new Error('Expected at least 3 platform JSON files, found ' + files.length);
+            if (files.length < 2) {
+              throw new Error('Expected at least 2 platform JSON files, found ' + files.length);
             }
 
             const documents = files.map((file) => {
-              const content = fs.readFileSync(file, 'utf8');
-              return JSON.parse(content);
+              return JSON.parse(fs.readFileSync(file, 'utf8'));
             });
 
             const versions = [...new Set(documents.map((doc) => doc.version))];
@@ -189,9 +181,6 @@ jobs:
               Object.assign(merged.platforms, document.platforms);
             }
 
-            if (!merged.platforms['darwin-aarch64'] && merged.platforms['darwin-aarch64-app']) {
-              merged.platforms['darwin-aarch64'] = merged.platforms['darwin-aarch64-app'];
-            }
             if (!merged.platforms['windows-x86_64'] && merged.platforms['windows-x86_64-nsis']) {
               merged.platforms['windows-x86_64'] = merged.platforms['windows-x86_64-nsis'];
             }
@@ -199,47 +188,38 @@ jobs:
               merged.platforms['linux-x86_64'] = merged.platforms['linux-x86_64-appimage'];
             }
 
-            const requiredPlatforms = ['darwin-aarch64', 'windows-x86_64', 'linux-x86_64'];
-            for (const platform of requiredPlatforms) {
+            const required = ['windows-x86_64', 'linux-x86_64'];
+            for (const platform of required) {
               const entry = merged.platforms[platform];
-              if (!entry) {
-                throw new Error('Missing updater platform: ' + platform);
-              }
-              if (!entry.url || !entry.signature) {
-                throw new Error('Updater platform ' + platform + ' is missing url or signature');
-              }
+              if (!entry) throw new Error('Missing updater platform: ' + platform);
+              if (!entry.url || !entry.signature) throw new Error('Updater platform ' + platform + ' is missing url or signature');
             }
 
-            fs.writeFileSync(
-              'updater-channel/latest.json',
-              JSON.stringify(merged, null, 2) + '\n',
-              'utf8'
-            );
-
+            fs.writeFileSync('updater-channel/latest.json', JSON.stringify(merged, null, 2) + '\n');
             console.log('Updater version:', merged.version);
             console.log('Updater platforms:', Object.keys(merged.platforms).sort().join(', '));
           "
 
-      - name: Ensure updater-beta release exists
+      - name: Ensure updater-windows-linux-beta release exists
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release view updater-beta \
+          gh release view updater-windows-linux-beta \
             --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1 || \
-          gh release create updater-beta \
+          gh release create updater-windows-linux-beta \
             --repo "${GITHUB_REPOSITORY}" \
             --target main \
-            --title "EF Planner Beta Updater Channel" \
+            --title "EF Planner Windows and Linux Beta Updater Channel" \
             --prerelease \
-            --notes "Canal permanente de actualizaciones beta de EF Planner."
+            --notes "Canal permanente de actualizaciones beta de EF Planner para Windows y Linux."
 
-      - name: Upload latest.json to updater-beta
+      - name: Upload latest.json to updater-windows-linux-beta
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release upload updater-beta \
+          gh release upload updater-windows-linux-beta \
             updater-channel/latest.json \
             --repo "${GITHUB_REPOSITORY}" \
             --clobber

@@ -1,0 +1,12 @@
+{
+  "bundle": {
+    "targets": ["appimage"]
+  },
+  "plugins": {
+    "updater": {
+      "endpoints": [
+        "https://github.com/miguecuevas23/ef-planner/releases/download/updater-windows-linux-beta/latest.json"
+      ]
+    }
+  }
+}
