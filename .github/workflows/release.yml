@@ -88,6 +88,35 @@ jobs:
           retryAttempts: 2
           args: --target ${{ matrix.target }}
 
+      - name: Capture platform updater JSON
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          New-Item -ItemType Directory -Force "platform-json" | Out-Null
+
+          gh release download "${{ github.ref_name }}" `
+            --repo "${{ github.repository }}" `
+            --pattern "latest.json" `
+            --dir "platform-json" `
+            --clobber
+
+          if (-not (Test-Path "platform-json/latest.json")) {
+            throw "latest.json was not found after build for ${{ matrix.platform }}"
+          }
+
+          Copy-Item `
+            "platform-json/latest.json" `
+            "platform-json/latest-${{ matrix.platform }}.json"
+
+      - name: Upload platform updater JSON
+        uses: actions/upload-artifact@v4
+        with:
+          name: updater-json-${{ matrix.platform }}
+          path: platform-json/latest-${{ matrix.platform }}.json
+          if-no-files-found: error
+          retention-days: 5
+
   publish-updater:
     name: Publish updater channel
     needs: build
@@ -95,51 +124,106 @@ jobs:
     runs-on: ubuntu-22.04
     permissions:
       contents: write
-    env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-      - name: Download generated latest.json from tag release
-        shell: bash
-        run: |
-          mkdir -p updater-channel
-          gh release download "${GITHUB_REF_NAME}" \
-            --repo "${GITHUB_REPOSITORY}" \
-            --pattern "latest.json" \
-            --dir updater-channel
-          test -s updater-channel/latest.json
-          echo "Downloaded latest.json ($(wc -c < updater-channel/latest.json) bytes)"
+      - name: Download platform updater JSONs
+        uses: actions/download-artifact@v4
+        with:
+          pattern: updater-json-*
+          path: updater-jsons
+          merge-multiple: true
 
-      - name: Validate platforms in latest.json
+      - name: List platform JSONs
         shell: bash
         run: |
-          echo "=== Platforms found ==="
+          echo "Platform JSON files:"
+          find updater-jsons -maxdepth 2 -type f -name "*.json" -print
+
+      - name: Merge platform JSONs into latest.json
+        shell: bash
+        run: |
           node -e "
             const fs = require('fs');
-            const data = JSON.parse(fs.readFileSync('updater-channel/latest.json', 'utf8'));
-            console.log('Version:', data.version);
-            const platforms = data.platforms || {};
-            const names = Object.keys(platforms);
-            console.log('Platforms (' + names.length + '):', names.join(', '));
+            const path = require('path');
 
-            const required = ['darwin-aarch64', 'windows-x86_64', 'linux-x86_64'];
-            const missing = required.filter(p => !names.includes(p));
-            if (missing.length > 0) {
-              console.error('MISSING platforms:', missing.join(', '));
-              process.exit(1);
+            const inputDir = 'updater-jsons';
+            const outputDir = 'updater-channel';
+
+            fs.mkdirSync(outputDir, { recursive: true });
+
+            let files = [];
+            function walk(d) {
+              for (const entry of fs.readdirSync(d, { withFileTypes: true })) {
+                const fp = path.join(d, entry.name);
+                if (entry.isDirectory()) walk(fp);
+                else if (entry.name.endsWith('.json')) files.push(fp);
+              }
+            }
+            walk(inputDir);
+
+            if (files.length < 3) {
+              throw new Error('Expected at least 3 platform JSON files, found ' + files.length);
             }
 
-            for (const name of names) {
-              const p = platforms[name];
-              if (!p.url)  { console.error(name + ': missing url');  process.exit(1); }
-              if (!p.signature) { console.error(name + ': missing signature'); process.exit(1); }
-              console.log('  OK ' + name + ' — url + signature present');
+            const documents = files.map((file) => {
+              const content = fs.readFileSync(file, 'utf8');
+              return JSON.parse(content);
+            });
+
+            const versions = [...new Set(documents.map((doc) => doc.version))];
+            if (versions.length !== 1) {
+              throw new Error('Platform JSON versions do not match: ' + versions.join(', '));
             }
-            console.log('All platforms validated.');
+
+            const merged = {
+              version: documents[0].version,
+              notes: documents[0].notes ?? '',
+              pub_date: documents[0].pub_date,
+              platforms: {}
+            };
+
+            for (const document of documents) {
+              if (!document.platforms || typeof document.platforms !== 'object') {
+                throw new Error('A platform JSON does not contain platforms');
+              }
+              Object.assign(merged.platforms, document.platforms);
+            }
+
+            if (!merged.platforms['darwin-aarch64'] && merged.platforms['darwin-aarch64-app']) {
+              merged.platforms['darwin-aarch64'] = merged.platforms['darwin-aarch64-app'];
+            }
+            if (!merged.platforms['windows-x86_64'] && merged.platforms['windows-x86_64-nsis']) {
+              merged.platforms['windows-x86_64'] = merged.platforms['windows-x86_64-nsis'];
+            }
+            if (!merged.platforms['linux-x86_64'] && merged.platforms['linux-x86_64-appimage']) {
+              merged.platforms['linux-x86_64'] = merged.platforms['linux-x86_64-appimage'];
+            }
+
+            const requiredPlatforms = ['darwin-aarch64', 'windows-x86_64', 'linux-x86_64'];
+            for (const platform of requiredPlatforms) {
+              const entry = merged.platforms[platform];
+              if (!entry) {
+                throw new Error('Missing updater platform: ' + platform);
+              }
+              if (!entry.url || !entry.signature) {
+                throw new Error('Updater platform ' + platform + ' is missing url or signature');
+              }
+            }
+
+            fs.writeFileSync(
+              'updater-channel/latest.json',
+              JSON.stringify(merged, null, 2) + '\n',
+              'utf8'
+            );
+
+            console.log('Updater version:', merged.version);
+            console.log('Updater platforms:', Object.keys(merged.platforms).sort().join(', '));
           "
 
       - name: Ensure updater-beta release exists
         shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release view updater-beta \
             --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1 || \
@@ -152,6 +236,8 @@ jobs:
 
       - name: Upload latest.json to updater-beta
         shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release upload updater-beta \
             updater-channel/latest.json \
