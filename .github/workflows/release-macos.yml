@@ -117,8 +117,15 @@ jobs:
           ARCHIVE="$(find src-tauri/target -type f -name '*.app.tar.gz' -print -quit)"
           SIGNATURE="${ARCHIVE}.sig"
 
+          APP_VERSION="$(node -p "require('./src-tauri/tauri.conf.json').version")"
+
+          if [ -z "${APP_VERSION}" ]; then
+            echo "ERROR: Could not read app version from tauri.conf.json"
+            exit 1
+          fi
+
           cp "${DMG}" \
-            "updater-macos/EF.Planner_1.4.1_aarch64.dmg"
+            "updater-macos/EF.Planner_${APP_VERSION}_aarch64.dmg"
 
           cp "${ARCHIVE}" \
             "updater-macos/EF.Planner_aarch64.app.tar.gz"
@@ -126,7 +133,7 @@ jobs:
           cp "${SIGNATURE}" \
             "updater-macos/EF.Planner_aarch64.app.tar.gz.sig"
 
-          test -s "updater-macos/EF.Planner_1.4.1_aarch64.dmg"
+          test -s "updater-macos/EF.Planner_${APP_VERSION}_aarch64.dmg"
           test -s "updater-macos/EF.Planner_aarch64.app.tar.gz"
           test -s "updater-macos/EF.Planner_aarch64.app.tar.gz.sig"
 
@@ -153,9 +160,12 @@ jobs:
           const repository = process.env.GITHUB_REPOSITORY;
           const tag = process.env.GITHUB_REF_NAME;
 
-          if (config.version !== "1.4.1") {
+          if (
+            !config.version ||
+            typeof config.version !== "string"
+          ) {
             throw new Error(
-              `Expected version 1.4.1 but found ${config.version}`
+              "App version is missing or invalid in src-tauri/tauri.conf.json"
             );
           }
 
@@ -182,9 +192,11 @@ jobs:
             url
           };
 
+          const appVersion = config.version;
+
           const latest = {
-            version: "1.4.1",
-            notes: "Versión beta 1.4.1 de EF Planner para macOS.",
+            version: appVersion,
+            notes: `Versión beta ${appVersion} de EF Planner para macOS.`,
             pub_date: new Date().toISOString(),
             platforms: {
               "darwin-aarch64": entry,
@@ -242,6 +254,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          APP_VERSION="$(node -p "require('./src-tauri/tauri.conf.json').version")"
+
           gh release view "${GITHUB_REF_NAME}" \
             --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1 || \
           gh release create "${GITHUB_REF_NAME}" \
@@ -249,15 +263,17 @@ jobs:
             --target "${GITHUB_SHA}" \
             --title "EF Planner ${GITHUB_REF_NAME}" \
             --prerelease \
-            --notes "Versión beta 1.4.1 de EF Planner para macOS."
+            --notes "Versión beta ${APP_VERSION} de EF Planner para macOS."
 
       - name: Upload macOS assets to version release
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          APP_VERSION="$(node -p "require('./src-tauri/tauri.conf.json').version")"
+
           gh release upload "${GITHUB_REF_NAME}" \
-            "updater-macos/EF.Planner_1.4.1_aarch64.dmg" \
+            "updater-macos/EF.Planner_${APP_VERSION}_aarch64.dmg" \
             "updater-macos/EF.Planner_aarch64.app.tar.gz" \
             "updater-macos/EF.Planner_aarch64.app.tar.gz.sig" \
             "updater-macos/latest.json" \
