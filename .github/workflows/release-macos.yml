@@ -5,6 +5,7 @@ on:
   push:
     tags:
       - "v*-beta-macos"
+      - "v*-beta-macos.*"
 
 jobs:
   build:
