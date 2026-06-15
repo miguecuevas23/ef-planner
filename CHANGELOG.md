@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.6.0-beta
+
+- Agregado constructor experimental de componentes de habilidad.
+- Integrada taxonomía de Bloom desde catálogo JSON.
+- Agregada selección de nivel educativo y cursos.
+- Agregada selección de proceso cognitivo y verbo.
+- Agregadas categorías de habilidades de Educación Física.
+- Agregados campos de habilidad, contexto y criterio.
+- Agregada vista previa editable.
+- Agregada biblioteca de habilidades por curso.
+- Agregado CRUD, favoritos y duplicación de habilidades.
+- Agregado feature flag experimental.
+- Mantenido acceso público de Planificación como "Próximamente".
+- Preparada arquitectura futura para conocimientos, actitudes y OA completos.
+
 ## 1.5.0-beta
 
 - Preparada la arquitectura inicial del futuro planificador de clases.

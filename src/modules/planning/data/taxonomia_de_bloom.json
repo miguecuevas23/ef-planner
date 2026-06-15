@@ -1,0 +1,191 @@
+{
+  "version": "1.0",
+  "title": "Taxonomía de Bloom — EF Planner",
+  "levels": {
+    "RECORDAR": {
+      "order": "lower",
+      "description": "Recuperar información relevante de la memoria a largo plazo.",
+      "actions": [
+        "Identificar",
+        "Reconocer",
+        "Nombrar",
+        "Enumerar",
+        "Describir",
+        "Recordar",
+        "Listar",
+        "Definir",
+        "Señalar",
+        "Reproducir"
+      ],
+      "keywords": [
+        "recordar",
+        "memorizar",
+        "repetir",
+        "reconocer"
+      ],
+      "results": [
+        "El estudiante recupera conocimientos o datos previamente aprendidos."
+      ],
+      "questions": [
+        "¿Qué recuerdas sobre...?",
+        "¿Puedes nombrar los elementos de...?",
+        "¿Cómo describirías...?"
+      ]
+    },
+    "COMPRENDER": {
+      "order": "lower",
+      "description": "Construir significado a partir de material educativo.",
+      "actions": [
+        "Explicar",
+        "Interpretar",
+        "Resumir",
+        "Comparar",
+        "Clasificar",
+        "Ejemplificar",
+        "Parafrasear",
+        "Inferir",
+        "Describir",
+        "Relacionar"
+      ],
+      "keywords": [
+        "comprender",
+        "entender",
+        "interpretar",
+        "explicar",
+        "diferenciar"
+      ],
+      "results": [
+        "El estudiante demuestra comprensión del contenido y puede expresarlo con sus propias palabras."
+      ],
+      "questions": [
+        "¿Cómo explicarías... con tus propias palabras?",
+        "¿Qué diferencias encuentras entre...?",
+        "¿Puedes poner un ejemplo de...?"
+      ]
+    },
+    "APLICAR": {
+      "order": "lower",
+      "description": "Usar un procedimiento o concepto en una situación conocida o nueva.",
+      "actions": [
+        "Ejecutar",
+        "Implementar",
+        "Utilizar",
+        "Aplicar",
+        "Resolver",
+        "Demostrar",
+        "Practicar",
+        "Realizar",
+        "Construir",
+        "Desarrollar"
+      ],
+      "keywords": [
+        "aplicar",
+        "usar",
+        "ejecutar",
+        "practicar",
+        "resolver"
+      ],
+      "results": [
+        "El estudiante aplica procedimientos o conceptos en contextos motrices específicos."
+      ],
+      "questions": [
+        "¿Cómo aplicarías... en este juego?",
+        "¿De qué manera usarías... para resolver esta situación?",
+        "¿Puedes demostrar cómo se ejecuta...?"
+      ]
+    },
+    "ANALIZAR": {
+      "order": "higher",
+      "description": "Descomponer un todo en sus partes y determinar cómo se relacionan.",
+      "actions": [
+        "Analizar",
+        "Diferenciar",
+        "Organizar",
+        "Descomponer",
+        "Comparar",
+        "Examinar",
+        "Distinguir",
+        "Categorizar",
+        "Investigar",
+        "Evaluar críticamente"
+      ],
+      "keywords": [
+        "analizar",
+        "diferenciar",
+        "comparar",
+        "examinar",
+        "organizar"
+      ],
+      "results": [
+        "El estudiante analiza movimientos, tácticas o situaciones de juego identificando sus componentes."
+      ],
+      "questions": [
+        "¿Qué elementos componen este movimiento?",
+        "¿Cómo se relacionan... y... en esta jugada?",
+        "¿Qué diferencias observas entre ambas técnicas?"
+      ]
+    },
+    "EVALUAR": {
+      "order": "higher",
+      "description": "Emitir juicios basados en criterios y estándares.",
+      "actions": [
+        "Evaluar",
+        "Justificar",
+        "Argumentar",
+        "Valorar",
+        "Seleccionar",
+        "Decidir",
+        "Criticar constructivamente",
+        "Recomendar",
+        "Juzgar",
+        "Priorizar"
+      ],
+      "keywords": [
+        "evaluar",
+        "juzgar",
+        "valorar",
+        "decidir",
+        "justificar"
+      ],
+      "results": [
+        "El estudiante evalúa su desempeño o el de otros usando criterios objetivos."
+      ],
+      "questions": [
+        "¿Cómo evaluarías tu desempeño en esta actividad?",
+        "¿Qué criterios usarías para juzgar esta ejecución?",
+        "¿Por qué consideras que esta estrategia es más efectiva?"
+      ]
+    },
+    "CREAR": {
+      "order": "higher",
+      "description": "Reunir elementos para formar un todo nuevo, coherente y original.",
+      "actions": [
+        "Crear",
+        "Diseñar",
+        "Elaborar",
+        "Proponer",
+        "Improvisar",
+        "Componer",
+        "Inventar",
+        "Planificar",
+        "Construir",
+        "Adaptar"
+      ],
+      "keywords": [
+        "crear",
+        "diseñar",
+        "inventar",
+        "improvisar",
+        "proponer"
+      ],
+      "results": [
+        "El estudiante crea secuencias, juegos o estrategias motrices originales."
+      ],
+      "questions": [
+        "¿Puedes diseñar una nueva secuencia de movimientos?",
+        "¿Cómo crearías un juego que trabaje esta habilidad?",
+        "¿Qué estrategia propondrías para resolver este desafío?"
+      ]
+    }
+  }
+}
