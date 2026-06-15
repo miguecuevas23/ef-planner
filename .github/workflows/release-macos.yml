@@ -74,9 +74,12 @@ jobs:
 
           if [ -z "${ARCHIVE}" ] || [ ! -f "${ARCHIVE}" ]; then
             echo "macOS updater archive .app.tar.gz was not found"
-            find src-tauri/target -maxdepth 8 -type f -print
+            echo "Files generated inside target:"
+            find src-tauri/target -maxdepth 10 -type f -print
             exit 1
           fi
+
+          SIGNATURE_FILE="${ARCHIVE}.sig"
 
           if [ ! -f "${SIGNATURE_FILE}" ]; then
             echo "macOS updater signature was not found: ${SIGNATURE_FILE}"
@@ -89,7 +92,8 @@ jobs:
           test -s "updater-macos/EF.Planner_aarch64.app.tar.gz"
           test -s "updater-macos/EF.Planner_aarch64.app.tar.gz.sig"
 
-          echo "macOS updater assets prepared successfully"
+          echo "macOS updater archive prepared."
+          echo "Archive source: ${ARCHIVE}"
 
       - name: Create macOS latest.json
         shell: bash
@@ -97,35 +101,55 @@ jobs:
           node <<'NODE'
           const fs = require("fs");
 
+          const configPath = "src-tauri/tauri.conf.json";
+          const signaturePath =
+            "updater-macos/EF.Planner_aarch64.app.tar.gz.sig";
+          const outputPath = "updater-macos/latest.json";
+
           const config = JSON.parse(
-            fs.readFileSync("src-tauri/tauri.conf.json", "utf8")
+            fs.readFileSync(configPath, "utf8")
           );
 
           const signature = fs
-            .readFileSync(
-              "updater-macos/EF.Planner_aarch64.app.tar.gz.sig",
-              "utf8"
-            )
+            .readFileSync(signaturePath, "utf8")
             .trim();
-
-          if (!config.version) {
-            throw new Error("App version is missing from tauri.conf.json");
-          }
-
-          if (!signature) {
-            throw new Error("macOS updater signature is empty");
-          }
 
           const repository = process.env.GITHUB_REPOSITORY;
           const tag = process.env.GITHUB_REF_NAME;
 
-          if (!repository || !tag) {
-            throw new Error("GITHUB_REPOSITORY or GITHUB_REF_NAME is missing");
+          if (!config.version) {
+            throw new Error(
+              "App version is missing from src-tauri/tauri.conf.json"
+            );
           }
+
+          if (!signature) {
+            throw new Error(
+              "macOS updater signature is empty"
+            );
+          }
+
+          if (!repository) {
+            throw new Error(
+              "GITHUB_REPOSITORY environment variable is missing"
+            );
+          }
+
+          if (!tag) {
+            throw new Error(
+              "GITHUB_REF_NAME environment variable is missing"
+            );
+          }
+
+          const archiveName =
+            "EF.Planner_aarch64.app.tar.gz";
+
+          const encodedTag = encodeURIComponent(tag);
+          const encodedArchive = encodeURIComponent(archiveName);
 
           const url =
             `https://github.com/${repository}/releases/download/` +
-            `${encodeURIComponent(tag)}/EF.Planner_aarch64.app.tar.gz`;
+            `${encodedTag}/${encodedArchive}`;
 
           const updaterEntry = {
             signature,
@@ -143,33 +167,95 @@ jobs:
           };
 
           fs.writeFileSync(
-            "updater-macos/latest.json",
+            outputPath,
             JSON.stringify(latest, null, 2) + "\n",
             "utf8"
           );
 
           console.log("Updater version:", latest.version);
-          console.log("Updater platforms:", Object.keys(latest.platforms).join(", "));
+          console.log(
+            "Updater platforms:",
+            Object.keys(latest.platforms).join(", ")
+          );
+          console.log("Updater package:", archiveName);
           NODE
 
       - name: Validate macOS latest.json
         shell: bash
         run: |
-          node -e "
-            const fs = require('fs');
-            const data = JSON.parse(fs.readFileSync('updater-macos/latest.json', 'utf8'));
+          node <<'NODE'
+          const fs = require("fs");
 
-            if (!data.version) throw new Error('version is empty');
-            if (!data.platforms) throw new Error('platforms is missing');
+          const path = "updater-macos/latest.json";
 
-            const entry = data.platforms['darwin-aarch64'];
-            if (!entry) throw new Error('darwin-aarch64 platform is missing');
-            if (!entry.url) throw new Error('darwin-aarch64 url is empty');
-            if (!entry.signature) throw new Error('darwin-aarch64 signature is empty');
-            if (!entry.url.includes('EF.Planner_aarch64.app.tar.gz')) throw new Error('url does not point to the expected archive');
+          if (!fs.existsSync(path)) {
+            throw new Error(
+              "updater-macos/latest.json does not exist"
+            );
+          }
 
-            console.log('Validation OK — version:', data.version);
-          "
+          const latest = JSON.parse(
+            fs.readFileSync(path, "utf8")
+          );
+
+          if (!latest.version) {
+            throw new Error(
+              "latest.json does not contain version"
+            );
+          }
+
+          if (!latest.platforms) {
+            throw new Error(
+              "latest.json does not contain platforms"
+            );
+          }
+
+          const requiredPlatforms = [
+            "darwin-aarch64",
+            "darwin-aarch64-app"
+          ];
+
+          for (const platform of requiredPlatforms) {
+            const entry = latest.platforms[platform];
+
+            if (!entry) {
+              throw new Error(
+                `Missing macOS updater platform: ${platform}`
+              );
+            }
+
+            if (!entry.url) {
+              throw new Error(
+                `Platform ${platform} does not contain url`
+              );
+            }
+
+            if (!entry.signature) {
+              throw new Error(
+                `Platform ${platform} does not contain signature`
+              );
+            }
+
+            if (
+              !entry.url.includes(
+                "EF.Planner_aarch64.app.tar.gz"
+              )
+            ) {
+              throw new Error(
+                `Unexpected updater URL for ${platform}`
+              );
+            }
+          }
+
+          console.log(
+            "macOS latest.json validation completed."
+          );
+          console.log("Version:", latest.version);
+          console.log(
+            "Platforms:",
+            Object.keys(latest.platforms).join(", ")
+          );
+          NODE
 
       - name: Upload macOS updater assets to version release
         shell: bash
