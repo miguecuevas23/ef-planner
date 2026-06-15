@@ -1,0 +1,14 @@
+{
+  "bundle": {
+    "active": true,
+    "targets": ["dmg"],
+    "createUpdaterArtifacts": true
+  },
+  "plugins": {
+    "updater": {
+      "endpoints": [
+        "https://github.com/miguecuevas23/ef-planner/releases/download/updater-macos-beta/latest.json"
+      ]
+    }
+  }
+}
