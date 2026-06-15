@@ -62,49 +62,126 @@ jobs:
           retryAttempts: 2
           args: --target aarch64-apple-darwin
 
-      - name: Capture macOS updater JSON
-        shell: pwsh
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Prepare macOS updater assets
+        shell: bash
         run: |
-          New-Item -ItemType Directory -Force "platform-json" | Out-Null
+          set -euo pipefail
 
-          gh release download "${{ github.ref_name }}" `
-            --repo "${{ github.repository }}" `
-            --pattern "latest.json" `
-            --dir "platform-json" `
-            --clobber
+          mkdir -p updater-macos
 
-          if (-not (Test-Path "platform-json/latest.json")) {
-            throw "latest.json was not found after macOS build"
+          ARCHIVE="$(find src-tauri/target -type f -name '*.app.tar.gz' | head -n 1)"
+          SIGNATURE_FILE="${ARCHIVE}.sig"
+
+          if [ -z "${ARCHIVE}" ] || [ ! -f "${ARCHIVE}" ]; then
+            echo "macOS updater archive .app.tar.gz was not found"
+            find src-tauri/target -maxdepth 8 -type f -print
+            exit 1
+          fi
+
+          if [ ! -f "${SIGNATURE_FILE}" ]; then
+            echo "macOS updater signature was not found: ${SIGNATURE_FILE}"
+            exit 1
+          fi
+
+          cp "${ARCHIVE}" "updater-macos/EF.Planner_aarch64.app.tar.gz"
+          cp "${SIGNATURE_FILE}" "updater-macos/EF.Planner_aarch64.app.tar.gz.sig"
+
+          test -s "updater-macos/EF.Planner_aarch64.app.tar.gz"
+          test -s "updater-macos/EF.Planner_aarch64.app.tar.gz.sig"
+
+          echo "macOS updater assets prepared successfully"
+
+      - name: Create macOS latest.json
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require("fs");
+
+          const config = JSON.parse(
+            fs.readFileSync("src-tauri/tauri.conf.json", "utf8")
+          );
+
+          const signature = fs
+            .readFileSync(
+              "updater-macos/EF.Planner_aarch64.app.tar.gz.sig",
+              "utf8"
+            )
+            .trim();
+
+          if (!config.version) {
+            throw new Error("App version is missing from tauri.conf.json");
           }
 
-          Copy-Item `
-            "platform-json/latest.json" `
-            "platform-json/latest-darwin-aarch64.json"
+          if (!signature) {
+            throw new Error("macOS updater signature is empty");
+          }
 
-      - name: Validate and prepare macOS latest.json
+          const repository = process.env.GITHUB_REPOSITORY;
+          const tag = process.env.GITHUB_REF_NAME;
+
+          if (!repository || !tag) {
+            throw new Error("GITHUB_REPOSITORY or GITHUB_REF_NAME is missing");
+          }
+
+          const url =
+            `https://github.com/${repository}/releases/download/` +
+            `${encodeURIComponent(tag)}/EF.Planner_aarch64.app.tar.gz`;
+
+          const updaterEntry = {
+            signature,
+            url
+          };
+
+          const latest = {
+            version: config.version,
+            notes: "Versión beta de EF Planner para macOS.",
+            pub_date: new Date().toISOString(),
+            platforms: {
+              "darwin-aarch64": updaterEntry,
+              "darwin-aarch64-app": updaterEntry
+            }
+          };
+
+          fs.writeFileSync(
+            "updater-macos/latest.json",
+            JSON.stringify(latest, null, 2) + "\n",
+            "utf8"
+          );
+
+          console.log("Updater version:", latest.version);
+          console.log("Updater platforms:", Object.keys(latest.platforms).join(", "));
+          NODE
+
+      - name: Validate macOS latest.json
         shell: bash
         run: |
           node -e "
             const fs = require('fs');
-            const data = JSON.parse(fs.readFileSync('platform-json/latest-darwin-aarch64.json', 'utf8'));
-            const platforms = data.platforms || {};
+            const data = JSON.parse(fs.readFileSync('updater-macos/latest.json', 'utf8'));
 
-            if (!platforms['darwin-aarch64'] && platforms['darwin-aarch64-app']) {
-              platforms['darwin-aarch64'] = platforms['darwin-aarch64-app'];
-            }
+            if (!data.version) throw new Error('version is empty');
+            if (!data.platforms) throw new Error('platforms is missing');
 
-            const entry = platforms['darwin-aarch64'];
-            if (!entry) throw new Error('Missing darwin-aarch64 platform in latest.json');
-            if (!entry.url) throw new Error('darwin-aarch64 missing url');
-            if (!entry.signature) throw new Error('darwin-aarch64 missing signature');
+            const entry = data.platforms['darwin-aarch64'];
+            if (!entry) throw new Error('darwin-aarch64 platform is missing');
+            if (!entry.url) throw new Error('darwin-aarch64 url is empty');
+            if (!entry.signature) throw new Error('darwin-aarch64 signature is empty');
+            if (!entry.url.includes('EF.Planner_aarch64.app.tar.gz')) throw new Error('url does not point to the expected archive');
 
-            data.platforms = platforms;
-            fs.writeFileSync('updater-channel/latest.json', JSON.stringify(data, null, 2) + '\n');
-            console.log('macOS updater version:', data.version);
-            console.log('macOS platforms:', Object.keys(platforms).sort().join(', '));
+            console.log('Validation OK — version:', data.version);
           "
+
+      - name: Upload macOS updater assets to version release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "${GITHUB_REF_NAME}" \
+            "updater-macos/EF.Planner_aarch64.app.tar.gz" \
+            "updater-macos/EF.Planner_aarch64.app.tar.gz.sig" \
+            "updater-macos/latest.json" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --clobber
 
       - name: Ensure updater-macos-beta release exists
         shell: bash
@@ -126,6 +203,6 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release upload updater-macos-beta \
-            updater-channel/latest.json \
+            "updater-macos/latest.json" \
             --repo "${GITHUB_REPOSITORY}" \
             --clobber
