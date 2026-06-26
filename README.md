@@ -1,14 +1,15 @@
 # EF Planner
 
-Biblioteca pedagógica offline para profesores de Educación Física. Aplicación de escritorio que permite crear, buscar, editar, eliminar y respaldar actividades pedagógicas sin conexión a internet.
+Biblioteca pedagógica offline para profesores de Educación Física. Aplicación de escritorio que permite crear, buscar, editar, eliminar y respaldar actividades pedagógicas sin conexión a internet. Incluye el módulo de Planificación con un Constructor de Habilidades y una Biblioteca de Conocimientos para construir Objetivos de Aprendizaje.
 
 ## Tecnologías
 
-- [Tauri 2](https://tauri.app/) — framework de escritorio
+- [Tauri 2](https://tauri.app/) — framework de escritorio multiplataforma (macOS, Windows, Linux)
 - [React 19](https://react.dev/) — interfaz de usuario
 - [TypeScript](https://www.typescriptlang.org/) — tipado estático
-- [SQLite](https://www.sqlite.org/) — base de datos local
+- [SQLite](https://www.sqlite.org/) — base de datos local (dos bases separadas)
 - [Vite](https://vite.dev/) — bundler
+- [pnpm](https://pnpm.io/) — gestor de paquetes
 
 ## Requisitos
 
@@ -25,91 +26,153 @@ pnpm install
 # Desarrollo
 pnpm tauri dev
 
-# Build producción
+# Build producción multiplataforma
 pnpm tauri build
 ```
 
 ## Build beta para testers
 
-Para generar la app instalable:
+El workflow de GitHub Actions genera builds para:
+
+- macOS Apple Silicon (`.dmg` + updater `.app.tar.gz`)
+- Windows x64 (`.exe` NSIS)
+- Linux x64 (`.AppImage`)
 
 ```bash
-pnpm tauri build
+# macOS Apple Silicon
+pnpm tauri build --target aarch64-apple-darwin
+
+# Windows x64
+pnpm tauri build --target x86_64-pc-windows-msvc
+
+# Linux x64
+pnpm tauri build --target x86_64-unknown-linux-gnu
 ```
 
-El `.dmg` se genera en `src-tauri/target/release/bundle/dmg/`. La app también queda en `src-tauri/target/release/bundle/macos/EF Planner.app`.
+Los instalables se generan en `src-tauri/target/<target>/release/bundle/`.
 
-- `pnpm tauri dev` es para desarrollo con hot-reload
-- `pnpm tauri build` genera la app instalable para distribuir
-- Los datos locales del usuario se conservan entre actualizaciones
-- Se recomienda exportar respaldo JSON antes de probar versiones beta
+## Actualizaciones multiplataforma
 
-## Ícono de la app
+EF Planner usa Tauri Updater con dos canales permanentes:
 
-Para regenerar los íconos de la app a partir de una imagen fuente, coloca tu archivo `app-icon.png` en la raíz del proyecto y ejecuta:
+- **macOS:** `https://github.com/miguecuevas23/ef-planner/releases/download/updater-macos-beta/latest.json`
+- **Windows / Linux:** `https://github.com/miguecuevas23/ef-planner/releases/download/updater-windows-linux-beta/latest.json`
 
-```bash
-pnpm tauri icon app-icon.png
-```
+Los workflows `.github/workflows/release-macos.yml` y `.github/workflows/release-windows-linux.yml` generan los artefactos y actualizan el canal correspondiente automáticamente al hacer push de un tag.
 
-Esto regenerará todos los tamaños de íconos en `src-tauri/icons/`.
+Tags soportados:
 
-## Funcionalidades (v1.2.5-beta)
+- `v*-beta-macos` (ej. `v1.7.0-beta-macos`)
+- `v*-beta-windows-linux` (ej. `v1.7.0-beta-windows-linux`)
 
-### Biblioteca de actividades
+## Bases de datos
+
+| Base | Archivo lógico | Responsabilidad |
+|------|---------------|-----------------|
+| Principal | `sqlite:ef_planner.db` | Actividades, favoritos, configuración general, metadatos, settings |
+| Planificación | `sqlite:ef_planner_planning.db` | Habilidades, conocimientos, categorías y futura planificación de clases |
+
+Ambas bases tienen migraciones independientes y FKs internas. No existen foreign keys entre archivos SQLite distintos.
+
+## Módulos principales (v1.7.0-beta)
+
+### Actividades
 - CRUD completo de actividades pedagógicas
 - Búsqueda por texto, filtro por momento de clase y capacidad física
-- Vista de detalle con información pedagógica completa
-- Formulario con checkboxes para cursos sugeridos y opción "seleccionar todos"
-- Modal de confirmación para eliminación
+- Importación desde JSON y TXT estructurados con vista previa editable
+- Favoritas con sección exclusiva
+- Respaldos JSON (exportar/importar)
 
-### Favoritas
-- Marcar/desmarcar actividades como favoritas
-- Sección exclusiva con filtro de favoritas
+### Planificación
 
-### Persistencia y migraciones
-- Base de datos SQLite local protegida
-- Sistema de migraciones incrementales (`CREATE TABLE IF NOT EXISTS`, `ALTER TABLE`)
-- Nunca `DROP TABLE` — los datos del usuario son intocables
-- Seed inicial de actividades de ejemplo
+El módulo de Planificación agrupa los componentes necesarios para construir Objetivos de Aprendizaje:
 
-### Respaldos JSON
-- Exportar todas las actividades a archivo JSON
-- Importar desde archivo JSON sin duplicar
-- Carpeta configurable para respaldo rápido
+| Componente | Estado |
+|-----------|--------|
+| **Conocimientos** | Disponible — biblioteca con 12 áreas curriculares |
+| **Habilidades** | Disponible — constructor con taxonomía de Bloom y 5 categorías EF |
+| **Actitudes** | Próximamente |
+| **Objetivos de Aprendizaje** | Próximamente |
+| **Planificaciones** | Próximamente |
 
-### Actualizaciones
-- Tauri Updater integrado con GitHub Releases
-- Canal beta permanente (`updater-beta`)
-- Botón "Buscar actualizaciones" en Configuración
-- Flujo completo: detectar → descargar → instalar → reiniciar
-- Actualizaciones siempre opcionales, nunca automáticas
+#### Conocimientos
+- Biblioteca con filtros por nivel educativo, curso y área
+- 12 áreas predefinidas: Motricidad, Juegos y Deportes, Condición Física, Salud y Vida Activa, Expresión Corporal, Danza, Estrategias y Tácticas, Entrenamiento, Autocuidado y Seguridad, Primeros Auxilios, Liderazgo y Participación, Vida Activa y Comunidad
+- Posibilidad de crear nuevas áreas manualmente
+- CRUD completo, duplicación, favoritos
+- UUID v4 en todos los registros para sincronización futura
 
-### Configuración
-- Versión y canal de la app
-- Estado del esquema de datos
-- Preferencias de actualización (buscar al iniciar, canal beta/stable)
-- Carpeta de respaldos configurable
+#### Habilidades (Constructor)
+- Wizard de construcción basado en la taxonomía de Bloom (6 niveles)
+- Cinco categorías pedagógicas:
+  - Patrones Motores
+  - Habilidades motrices básicas
+  - Habilidades motrices específicas
+  - Habilidades motrices especializadas
+  - Capacidades físicas (Fuerza, Velocidad, Resistencia, Coordinación, Equilibrio)
+- Generación automática: `Verbo + patrón, habilidad o capacidad + contexto`
+- Edición manual del texto final
+- Biblioteca con filtros por nivel, proceso, categoría, capacidad y estado
 
-### Onboarding
-- Aviso inicial de ubicación de datos al abrir la app por primera vez
-- Selección de carpeta predeterminada para respaldos
+### Otras funcionalidades
+- **Persistencia**: migraciones incrementales, nunca `DROP TABLE`
+- **Respaldos JSON**: exportar/importar todas las actividades
+- **Configuración**: versión, canal, actualizaciones, carpeta de respaldos
+- **Navegación**: botones Home y Volver, diseño responsive con scroll
+- **Offline**: completamente offline, sin backend ni login
 
-### Navegación
-- Botón Home en todas las páginas internas
-- Botón Volver al inicio y al final de páginas largas
+## Estructura del proyecto
 
-### Offline
-- App completamente offline, sin backend ni login
+```
+ef-planner/
+├── src/
+│   ├── modules/
+│   │   ├── activities/        # CRUD de actividades
+│   │   ├── backup/            # Respaldos JSON
+│   │   ├── dashboard/         # Página principal
+│   │   ├── favorites/         # Actividades favoritas
+│   │   ├── import/            # Importador JSON/TXT
+│   │   ├── knowledge/         # Biblioteca de conocimientos
+│   │   │   ├── types/         # TypeScript types
+│   │   │   ├── services/      # Repositorio (usa planning DB)
+│   │   │   └── pages/         # Biblioteca y formulario
+│   │   ├── planning/          # Módulo de Planificación
+│   │   │   ├── data/          # Taxonomía de Bloom
+│   │   │   ├── constants/     # Categorías EF y capacidades físicas
+│   │   │   ├── types/         # TypeScript types de habilidades
+│   │   │   ├── services/      # Repositorios y servicios
+│   │   │   └── pages/         # Menú, constructor, biblioteca, detalle
+│   │   └── settings/          # Configuración
+│   ├── database/              # db.ts, planningDb.ts y migraciones
+│   ├── shared/                # Logo, constantes, feature flags, componentes
+│   ├── styles/                # Estilos globales
+│   └── App.tsx                # Router principal
+├── src-tauri/                 # Backend Rust + configuración Tauri
+│   ├── tauri.conf.json
+│   ├── tauri.macos.conf.json
+│   ├── tauri.macos.release.conf.json
+│   ├── tauri.windows.conf.json
+│   └── tauri.linux.conf.json
+├── docs/
+│   ├── PLANNING_ARCHITECTURE.md
+│   └── SKILL_OBJECTIVE_ARCHITECTURE.md
+└── .github/workflows/
+    ├── release-macos.yml
+    └── release-windows-linux.yml
+```
+
+## Documentación adicional
+
+- [`docs/PLANNING_ARCHITECTURE.md`](docs/PLANNING_ARCHITECTURE.md) — arquitectura de la base de planificación
+- [`docs/SKILL_OBJECTIVE_ARCHITECTURE.md`](docs/SKILL_OBJECTIVE_ARCHITECTURE.md) — arquitectura del Constructor de Habilidades
 
 ## Estrategia de actualizaciones seguras
 
-EF Planner es **local-first**. Los datos residen en SQLite local y nunca se borran durante actualizaciones. Las migraciones de BD son incrementales — nunca `DROP TABLE`. Las actualizaciones solo reemplazan el binario de la app, no tocan la base de datos. Ver [`docs/UPDATE_STRATEGY.md`](docs/UPDATE_STRATEGY.md) para más detalles.
+EF Planner es **local-first**. Los datos residen en SQLite local y nunca se borran durante actualizaciones. Las migraciones de BD son incrementales — nunca `DROP TABLE`. Las actualizaciones solo reemplazan el binario de la app, no tocan las bases de datos.
 
-## Funcionalidades futuras
+## Roadmap
 
-- Planificación de clases
-- Unidades didácticas
-- Evaluaciones
-- Exportación a PDF
-- Sincronización opcional entre dispositivos
+- **1.8.0**: Actitudes como componente del OA
+- **2.0.0**: Objetivos de Aprendizaje completos (Habilidad + Conocimiento + Actitud)
+- **2.x**: Planificación de clases, unidades didácticas, evaluaciones
+- **Futuro**: exportación a PDF, sincronización opcional entre dispositivos

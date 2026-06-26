@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.7.0-beta
+
+- Agregado módulo "Conocimientos" con base SQLite independiente.
+- Agregada Biblioteca de Conocimientos con filtros por nivel, curso y área.
+- Agregado formulario de creación y edición de conocimientos.
+- Agregadas 12 áreas curriculares predefinidas con posibilidad de crear nuevas.
+- Agregado CRUD completo, duplicación, favoritos y eliminación.
+- Agregada preparación con UUID para futuras versiones.
+- Mantenida separación total con bases de actividades, planificación y habilidades.
+- Mantenidos canales de actualización separados por plataforma.
+
 ## 1.6.0-beta
 
 - Agregado constructor experimental de componentes de habilidad.

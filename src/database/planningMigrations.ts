@@ -131,6 +131,43 @@ const migrations: Migration[] = [
     CREATE INDEX IF NOT EXISTS idx_skill_objectives_physical_capacity
       ON skill_objectives(physical_capacity);`,
   },
+  {
+    id: "004_create_knowledge_schema",
+    up: `CREATE TABLE IF NOT EXISTS knowledge_categories (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      uuid TEXT NOT NULL UNIQUE,
+      name TEXT NOT NULL UNIQUE,
+      description TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS knowledge_items (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      uuid TEXT NOT NULL UNIQUE,
+      title TEXT NOT NULL,
+      description TEXT NOT NULL,
+      educational_level TEXT NOT NULL CHECK(educational_level IN ('basic', 'secondary')),
+      course TEXT NOT NULL,
+      category_id INTEGER,
+      source TEXT,
+      notes TEXT,
+      is_favorite INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      version TEXT NOT NULL DEFAULT '1.0',
+      FOREIGN KEY (category_id) REFERENCES knowledge_categories(id) ON DELETE SET NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_knowledge_items_educational_level
+      ON knowledge_items(educational_level);
+    CREATE INDEX IF NOT EXISTS idx_knowledge_items_course
+      ON knowledge_items(course);
+    CREATE INDEX IF NOT EXISTS idx_knowledge_items_category_id
+      ON knowledge_items(category_id);
+    CREATE INDEX IF NOT EXISTS idx_knowledge_items_is_favorite
+      ON knowledge_items(is_favorite);`,
+  },
 ];
 
 export async function runPlanningMigrations(database: Database): Promise<void> {
